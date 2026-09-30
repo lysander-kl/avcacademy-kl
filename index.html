@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMK Avicena Rajeg - Portal Akademik</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,system-ui,sans-serif; }
+  :root {
+    --primary:#0b2a41; --primary-light:#1a3f5c; --accent:#ffd966;
+    --bg:#f0f6fc; --card:#ffffff; --border:#e3edf6; --text:#1e2b3a;
+    --text-muted:#3d6180; --success:#28a745; --danger:#dc3545; --warning:#ffc107;
+    --radius:20px; --shadow:0 4px 12px rgba(0,0,0,0.06);
+  }
+  body { background:var(--bg); color:var(--text); min-height:100vh; }
+  .app-container { max-width:1200px; margin:0 auto; padding:1.5rem; }
+
+  .main-header {
+    background:linear-gradient(145deg,#0b2a41,#123b5a); color:white;
+    padding:1rem 1.8rem; border-radius:28px; display:flex; flex-wrap:wrap;
+    align-items:center; justify-content:space-between; margin-bottom:2rem;
+    box-shadow:0 8px 24px rgba(0,20,40,0.25);
+  }
+  .logo-area { display:flex; align-items:center; gap:12px; }
+  .logo-area i { font-size:2rem; color:var(--accent); }
+  .logo-area h1 { font-size:1.5rem; font-weight:700; }
+  .logo-area span { font-size:0.8rem; opacity:0.8; display:block; margin-top:-4px; }
+  .user-area {
+    display:flex; align-items:center; gap:1rem; background:rgba(255,255,255,0.1);
+    padding:0.4rem 1.2rem 0.4rem 1.8rem; border-radius:40px; backdrop-filter:blur(4px);
+  }
+  .role-badge {
+    background:var(--accent); color:var(--primary); padding:0.2rem 0.8rem;
+    border-radius:30px; font-weight:600; font-size:0.75rem; text-transform:uppercase;
+  }
+  .user-name { font-weight:500; }
+  .logout-btn {
+    background:transparent; border:1px solid rgba(255,255,255,0.3); color:white;
+    padding:0.3rem 1rem; border-radius:30px; cursor:pointer; transition:0.2s; font-size:0.85rem;
+  }
+  .logout-btn:hover { background:rgba(255,255,255,0.2); }
+
+  .tab-nav {
+    display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:2rem;
+    background:white; padding:0.5rem 1rem; border-radius:60px;
+    box-shadow:var(--shadow); border:1px solid var(--border);
+  }
+  .tab-btn {
+    background:transparent; border:none; padding:0.6rem 1.4rem; border-radius:40px;
+    font-weight:600; color:var(--text-muted); cursor:pointer; transition:0.2s;
+    display:flex; align-items:center; gap:8px; font-size:0.95rem;
+  }
+  .tab-btn:hover { background:#e7f0fa; }
+  .tab-btn.active { background:var(--primary); color:white; box-shadow:0 4px 12px rgba(11,42,65,0.25); }
+
+  .tab-content { display:none; animation:fadeIn 0.3s ease; }
+  .tab-content.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+  .dashboard-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:1.5rem; margin-bottom:2rem;
+  }
+  .stat-card {
+    background:var(--card); padding:1.5rem; border-radius:24px; box-shadow:var(--shadow);
+    border:1px solid var(--border); display:flex; align-items:center; gap:1rem;
+  }
+  .stat-card i { font-size:2.2rem; color:var(--primary); width:3rem; text-align:center; }
+  .stat-detail { display:flex; flex-direction:column; }
+  .stat-label { font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-weight:600; }
+  .stat-value { font-size:1.4rem; font-weight:700; color:#082035; }
+
+  .table-container {
+    background:white; border-radius:24px; padding:1.5rem;
+    border:1px solid var(--border); overflow-x:auto; margin-bottom:1.5rem;
+  }
+  .table-container h3 { margin-bottom:1rem; color:var(--primary); display:flex; align-items:center; gap:10px; }
+  table { width:100%; border-collapse:collapse; font-size:0.95rem; }
+  th { text-align:left; padding:0.8rem 0.5rem; background:#f4f9ff; color:var(--primary); font-weight:600; }
+  td { padding:0.7rem 0.5rem; border-bottom:1px solid #eef6fc; }
+  .badge { display:inline-block; padding:0.2rem 0.8rem; border-radius:30px; font-size:0.75rem; font-weight:600; }
+  .badge-success { background:#d4edda; color:#155724; }
+  .badge-danger { background:#f8d7da; color:#721c24; }
+  .badge-warning { background:#fff3cd; color:#856404; }
+  .badge-info { background:#d1ecf1; color:#0c5460; }
+
+  .task-form, .admin-management {
+    background:#f8fbff; padding:1.5rem; border-radius:20px;
+    border:1px solid #dce8f2; margin:1rem 0;
+  }
+  input, textarea, select {
+    width:100%; padding:0.7rem 1rem; border:1px solid #dce8f2;
+    border-radius:12px; font-size:0.95rem; margin-bottom:0.8rem;
+    background:white; font-family:inherit; transition:border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--primary); }
+
+  button { font-family:inherit; }
+  .btn-primary, .task-form button, .admin-management button {
+    background:var(--primary); color:white; border:none; padding:0.7rem 2rem;
+    border-radius:40px; font-weight:600; cursor:pointer; transition:0.2s;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn-primary:hover, .task-form button:hover, .admin-management button:hover {
+    background:var(--primary-light); transform:translateY(-2px);
+  }
+  .btn-sm { padding:0.4rem 1rem !important; font-size:0.85rem; }
+  .btn-danger { background:var(--danger) !important; }
+  .btn-danger:hover { background:#c82333 !important; }
+  .btn-success { background:var(--success) !important; }
+  .btn-success:hover { background:#218838 !important; }
+  .btn-warning { background:var(--warning) !important; color:#333 !important; }
+  .btn-secondary { background:#6c757d !important; }
+
+  .login-screen {
+    max-width:420px; margin:4rem auto; background:white; padding:2.5rem 2rem;
+    border-radius:32px; box-shadow:0 20px 40px rgba(0,0,0,0.08);
+    border:1px solid var(--border); text-align:center;
+  }
+  .login-screen h2 { color:var(--primary); margin-bottom:0.5rem; }
+  .login-screen .sub { color:var(--text-muted); margin-bottom:1.8rem; }
+  .login-screen button {
+    width:100%; padding:0.9rem; background:var(--primary); color:white;
+    border:none; border-radius:40px; font-weight:700; font-size:1.1rem;
+    cursor:pointer; transition:0.2s;
+  }
+  .login-screen button:hover { background:var(--primary-light); }
+  .login-error { color:var(--danger); font-size:0.9rem; margin-top:0.5rem; display:none; }
+  .login-error.show { display:block; }
+
+  .app-content { display:none; }
+  .app-content.show { display:block; }
+  .login-screen.hide { display:none; }
+
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+
+  .empty-state { text-align:center; padding:2rem; color:#6c757d; }
+  .empty-state i { font-size:3rem; margin-bottom:1rem; opacity:0.5; }
+
+  #toastContainer {
+    position:fixed; top:20px; right:20px; z-index:9999;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .toast {
+    background:white; padding:1rem 1.5rem; border-radius:12px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.15); border-left:4px solid var(--primary);
+    min-width:280px; max-width:400px; display:flex; align-items:center; gap:12px;
+    animation:slideIn 0.3s ease; font-size:0.95rem;
+  }
+  .toast.success { border-left-color:var(--success); }
+  .toast.error { border-left-color:var(--danger); }
+  .toast.warning { border-left-color:var(--warning); }
+  .toast i { font-size:1.3rem; }
+  .toast.success i { color:var(--success); }
+  .toast.error i { color:var(--danger); }
+  .toast.warning i { color:var(--warning); }
+  @keyframes slideIn { from{transform:translateX(400px);opacity:0;} to{transform:translateX(0);opacity:1;} }
+
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000;
+    display:none; align-items:center; justify-content:center; padding:1rem;
+  }
+  .modal-overlay.show { display:flex; }
+  .modal {
+    background:white; border-radius:24px; padding:2rem; max-width:500px;
+    width:100%; max-height:90vh; overflow-y:auto;
+  }
+  .modal h3 { color:var(--primary); margin-bottom:1rem; }
+  .modal-actions { display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem; }
+
+  .task-item {
+    background:white; padding:1rem 1.2rem; border-radius:16px;
+    margin-bottom:0.8rem; border-left:4px solid var(--primary);
+    display:flex; justify-content:space-between; align-items:center; gap:1rem;
+    flex-wrap:wrap;
+  }
+  .task-item.done { border-left-color:var(--success); opacity:0.9; }
+  .task-item.overdue { border-left-color:var(--danger); }
+  .task-item h4 { color:var(--primary); font-size:1rem; margin-bottom:4px; }
+  .task-item small { color:var(--text-muted); }
+
+  .info-item {
+    background:#f8fbff; padding:0.8rem 1.2rem; border-radius:16px;
+    margin-bottom:0.8rem; border-left:4px solid var(--primary);
+  }
+
+  .absen-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:0.6rem 0.5rem; border-bottom:1px solid #eef6fc; gap:1rem;
+  }
+  .absen-row select {
+    width:auto; margin:0; padding:0.4rem 0.8rem; font-size:0.85rem;
+  }
+
+  .attendance-stat-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+    gap:0.8rem; margin-bottom:1rem;
+  }
+  .attendance-stat-grid > div {
+    padding:0.8rem; border-radius:12px; text-align:center;
+  }
+  .attendance-stat-grid small {
+    display:block; font-size:0.75rem; margin-bottom:2px;
+  }
+  .attendance-stat-grid strong { font-size:1.4rem; }
+
+  /* ===== STYLE KHUSUS JADWAL ===== */
+  .schedule-wrapper { overflow-x:auto; }
+  .schedule-table { width:100%; border-collapse:collapse; min-width:900px; }
+  .schedule-table th, .schedule-table td {
+    border:1px solid #dce8f2; padding:0.6rem; text-align:center; font-size:0.85rem;
+    vertical-align:middle;
+  }
+  .schedule-table th {
+    background:var(--primary); color:white; font-weight:600; padding:0.8rem 0.5rem;
+  }
+  .schedule-table .jam-col {
+    background:#f4f9ff; font-weight:700; color:var(--primary);
+    white-space:nowrap; font-size:0.8rem;
+  }
+  .schedule-table .istirahat-row td {
+    background:#fff8e1; color:#856404; font-weight:700; font-style:italic;
+  }
+  .schedule-table .mapel-cell {
+    background:white; transition:0.2s;
+  }
+  .schedule-table .mapel-cell:hover { background:#e7f0fa; }
+  .mapel-jurusan { color:var(--primary); font-weight:700; }
+  .mapel-umum { color:#555; }
+  .kelas-tabs {
+    display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.5rem;
+  }
+  .kelas-tab {
+    padding:0.5rem 1.1rem; border-radius:30px; border:1px solid var(--border);
+    background:white; color:var(--text-muted); font-weight:600; cursor:pointer;
+    font-size:0.85rem; transition:0.2s;
+  }
+  .kelas-tab:hover { background:#e7f0fa; }
+  .kelas-tab.active { background:var(--primary); color:white; border-color:var(--primary); }
+  .legend {
+    display:flex; gap:1.2rem; flex-wrap:wrap; margin-bottom:1rem; font-size:0.8rem;
+  }
+  .legend span { display:flex; align-items:center; gap:6px; }
+  .dot { width:12px; height:12px; border-radius:50%; display:inline-block; }
+  .dot-jurusan { background:var(--primary); }
+  .dot-umum { background:#aaa; }
+
+  @media (max-width:700px) {
+    .main-header { flex-direction:column; align-items:stretch; gap:0.8rem; }
+    .user-area { justify-content:space-between; padding:0.4rem 1rem; }
+    .tab-nav { border-radius:20px; padding:0.5rem; gap:0.3rem; }
+    .tab-btn { font-size:0.8rem; padding:0.4rem 0.8rem; }
+    .dashboard-grid { grid-template-columns:1fr 1fr; }
+    .form-row, .form-row-3 { grid-template-columns:1fr; }
+  }
+  @media (max-width:480px) {
+    .dashboard-grid { grid-template-columns:1fr; }
+    .stat-card { padding:1rem; }
+    #toastContainer { left:10px; right:10px; }
+    .toast { min-width:auto; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toastContainer"></div>
+<div id="modalContainer"></div>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" class="login-screen">
+  <div style="font-size:3rem; color:var(--primary); margin-bottom:0.5rem;">
+    <i class="fas fa-graduation-cap"></i>
+  </div>
+  <h2>SMK Avicena Rajeg</h2>
+  <p class="sub">Portal Akademik Terpadu</p>
+
+  <select id="roleSelect">
+    <option value="guru">Guru</option>
+    <option value="siswa">Siswa</option>
+    <option value="ortu">Orang Tua</option>
+  </select>
+
+  <div id="adminLoginPanel" style="display:none; margin-bottom:0.8rem; padding:0.8rem; background:#fff8e1; border:1px dashed #ffc107; border-radius:12px;">
+    <p style="font-size:0.8rem; color:#856404; margin-bottom:0.4rem; font-weight:600;">
+      <i class="fas fa-shield-alt"></i> MODE ADMIN AKTIF
+    </p>
+    <p style="font-size:0.75rem; color:#856404;">Masukkan credential admin untuk melanjutkan.</p>
+  </div>
+
+  <input type="text" id="usernameInput" placeholder="Username / NIS" autocomplete="off">
+  <input type="password" id="passwordInput" placeholder="Password">
+  <button onclick="handleLogin()"><i class="fas fa-arrow-right-to-bracket"></i> Masuk</button>
+  <div id="loginError" class="login-error"></div>
+  <p style="margin-top:1rem; font-size:0.8rem; color:var(--text-muted);">
+    <strong>Demo:</strong> budi/guru123 · ahmad/siswa123 · siti/ortu123
+  </p>
+  <p style="margin-top:0.5rem; font-size:0.7rem; color:#adb5bd;">
+    <i class="fas fa-key"></i> Admin: tekan <kbd style="background:#f4f9ff; padding:2px 6px; border-radius:4px; border:1px solid #dce8f2;">Ctrl+Shift+A</kbd>
+  </p>
+</div>
+
+<!-- ===== APLIKASI UTAMA ===== -->
+<div id="appContent" class="app-content">
+  <div class="app-container">
+    <header class="main-header">
+      <div class="logo-area">
+        <i class="fas fa-school"></i>
+        <div>
+          <h1>SMK Avicena</h1>
+          <span>Rajeg · Portal Akademik</span>
+        </div>
+      </div>
+      <div class="user-area">
+        <i class="fas fa-user-circle" style="font-size:1.8rem;"></i>
+        <span class="user-name" id="displayName">-</span>
+        <span class="role-badge" id="displayRole">-</span>
+        <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+      </div>
+    </header>
+
+    <nav class="tab-nav" id="tabNav">
+      <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-home"></i> Dashboard</button>
+      <button class="tab-btn" data-tab="jadwal"><i class="fas fa-calendar-alt"></i> Jadwal</button>
+      <button class="tab-btn" data-tab="tugas"><i class="fas fa-tasks"></i> Tugas</button>
+      <button class="tab-btn teacher-tab" data-tab="penilaian" style="display:none;"><i class="fas fa-clipboard-check"></i> Penilaian</button>
+      <button class="tab-btn" data-tab="nilai"><i class="fas fa-chart-line"></i> Nilai & Profil</button>
+      <button class="tab-btn" data-tab="absen"><i class="fas fa-clipboard-check"></i> Absen</button>
+      <button class="tab-btn" data-tab="info"><i class="fas fa-bell"></i> Info</button>
+      <button class="tab-btn admin-tab" data-tab="admin" style="display:none;"><i class="fas fa-user-shield"></i> Admin</button>
+    </nav>
+
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="dashboard-grid" id="dashboardStats"></div>
+      <div class="table-container">
+        <h3><i class="fas fa-clock"></i> Aktivitas Terbaru</h3>
+        <div id="recentActivity"></div>
+      </div>
+    </div>
+
+    <!-- ===== TAB JADWAL ===== -->
+    <div id="tab-jadwal" class="tab-content">
+      <div class="table-container">
+        <h3><i class="fas fa-calendar-week"></i> Jadwal Pelajaran & Ekskul</h3>
+
+        <div id="jadwalFilterContainer" style="margin-bottom:1rem; display:none;">
+          <label style="font-size:0.9rem; font-weight:600; margin-right:0.5rem;">Pilih Kelas:</label>
+          <select id="jadwalKelasSelect" onchange="renderSchedule()" style="width:auto; display:inline-block; padding:0.5rem 1rem; margin:0;">
+            <option value="X TKJ">X TKJ</option>
+            <option value="X DKV">X DKV</option>
+            <option value="X AKL">X AKL</option>
+            <option value="XI TKJ">XI TKJ</option>
+            <option value="XI DKV">XI DKV</option>
+            <option value="XI AKL">XI AKL</option>
+            <option value="XII TKJ">XII TKJ</option>
+            <option value="XII DKV">XII DKV</option>
+            <option value="XII AKL">XII AKL</option>
+          </select>
+        </div>
+
+        <div class="legend">
+          <span><span class="dot dot-jurusan"></span> Mata Pelajaran Jurusan</span>
+          <span><span class="dot dot-umum"></span> Mata Pelajaran Umum</span>
+          <span><i class="fas fa-mug-hot" style="color:#856404;"></i> Istirahat (09:30–10:00 & 12:00–13:00)</span>
+          <span><i class="fas fa-home" style="color:var(--danger);"></i> Pulang 15:00</span>
+        </div>
+
+        <div class="schedule-wrapper" id="scheduleTable"></div>
+      </div>
+    </div>
+
+    <!-- ===== TAB TUGAS ===== -->
+    <div id="tab-tugas" class="tab-content">
+      <div class="table-container">
+        <h3><i class="fas fa-file-pen"></i> Daftar Tugas</h3>
+        <div id="taskList"></div>
+      </div>
+      <div id="teacherTaskForm" style="display:none;" class="task-form">
+        <h4><i class="fas fa-plus-circle"></i> Kirim Tugas Baru</h4>
+        <input type="text" id="taskTitle" placeholder="Judul Tugas">
+        <textarea id="taskDesc" rows="2" placeholder="Deskripsi tugas (opsional)..."></textarea>
+        <div class="form-row">
+          <select id="taskClass">
+            <option value="X TKJ">X TKJ</option>
+            <option value="X DKV">X DKV</option>
+            <option value="X AKL">X AKL</option>
+            <option value="XI TKJ">XI TKJ</option>
+            <option value="XI DKV">XI DKV</option>
+            <option value="XI AKL">XI AKL</option>
+            <option value="XII TKJ">XII TKJ</option>
+            <option value="XII DKV">XII DKV</option>
+            <option value="XII AKL">XII AKL</option>
+          </select>
+          <input type="date" id="taskDeadline">
+        </div>
+        <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">
+          <i class="fas fa-paperclip"></i> Lampiran Soal (opsional - file/gambar, max 2MB)
+        </label>
+        <input type="file" id="taskAttachment" accept="image/*,.pdf,.doc,.docx,.txt" style="padding:0.5rem;">
+        <button onclick="sendTask()"><i class="fas fa-paper-plane"></i> Kirim Tugas</button>
+      </div>
+    </div>
+
+    <!-- ===== TAB PENILAIAN ===== -->
+    <div id="tab-penilaian" class="tab-content">
+      <div class="table-container">
+        <h3><i class="fas fa-clipboard-check"></i> Penilaian Tugas Siswa</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
+          Daftar tugas yang sudah dikumpulkan siswa. Klik <strong>"Buka & Nilai"</strong> untuk melihat jawaban & memberi nilai.
+        </p>
+        <div id="submissionList"></div>
+      </div>
+    </div>
+
+    <div id="tab-nilai" class="tab-content">
+      <div class="dashboard-grid">
+        <div class="stat-card"><i class="fas fa-id-card"></i><div class="stat-detail"><span class="stat-label">Profil</span><span class="stat-value" id="profileName">-</span></div></div>
+        <div class="stat-card"><i class="fas fa-star"></i><div class="stat-detail"><span class="stat-label">Skor Kelakuan</span><span class="stat-value" id="behaviorScore">-</span></div></div>
+        <div class="stat-card"><i class="fas fa-user-check"></i><div class="stat-detail"><span class="stat-label">Kehadiran</span><span class="stat-value" id="attendanceRate">-</span></div></div>
+      </div>
+      <div class="table-container">
+        <h3><i class="fas fa-list-check"></i> Rapor Nilai</h3>
+        <div id="gradeTable"></div>
+      </div>
+    </div>
+
+    <div id="tab-absen" class="tab-content">
+      <div class="table-container">
+        <h3><i class="fas fa-clipboard-list"></i> Rekap Absensi</h3>
+        <div id="attendanceTable"></div>
+      </div>
+      <div id="teacherAbsenForm" style="display:none;" class="task-form">
+        <h4><i class="fas fa-user-check"></i> Input Presensi Kelas</h4>
+        <div class="form-row">
+          <select id="absenClass" onchange="renderAbsenSiswaList()">
+            <option value="">-- Pilih Kelas --</option>
+            <option value="X TKJ">X TKJ</option>
+            <option value="X DKV">X DKV</option>
+            <option value="X AKL">X AKL</option>
+            <option value="XI TKJ">XI TKJ</option>
+            <option value="XI DKV">XI DKV</option>
+            <option value="XI AKL">XI AKL</option>
+            <option value="XII TKJ">XII TKJ</option>
+            <option value="XII DKV">XII DKV</option>
+            <option value="XII AKL">XII AKL</option>
+          </select>
+          <input type="date" id="absenTanggal">
+        </div>
+
+        <div style="display:flex; gap:0.5rem; margin-bottom:0.8rem; flex-wrap:wrap;">
+          <button class="btn-success btn-sm" onclick="tandaiSemua('Hadir')"><i class="fas fa-check"></i> Semua Hadir</button>
+          <button class="btn-warning btn-sm" onclick="tandaiSemua('Izin')"><i class="fas fa-envelope"></i> Semua Izin</button>
+          <button class="btn-warning btn-sm" onclick="tandaiSemua('Sakit')"><i class="fas fa-thermometer"></i> Semua Sakit</button>
+          <button class="btn-danger btn-sm" onclick="tandaiSemua('Bolos')"><i class="fas fa-times"></i> Semua Bolos</button>
+        </div>
+
+        <div id="absenSiswaList">
+          <div class="empty-state" style="padding:1rem;">
+            <p>Pilih kelas untuk menampilkan daftar siswa.</p>
+          </div>
+        </div>
+
+        <button onclick="saveAttendanceBatch()"><i class="fas fa-save"></i> Simpan Presensi</button>
+      </div>
+    </div>
+
+    <div id="tab-info" class="tab-content">
+      <div class="table-container">
+        <h3><i class="fas fa-bullhorn"></i> Pengumuman & Informasi</h3>
+        <div id="infoList"></div>
+      </div>
+      <div id="adminInfoForm" style="display:none;" class="task-form">
+        <h4><i class="fas fa-plus-circle"></i> Tambah Pengumuman</h4>
+        <input type="text" id="infoTitle" placeholder="Judul Pengumuman">
+        <textarea id="infoDesc" rows="2" placeholder="Isi pengumuman..."></textarea>
+        <button onclick="addInfo()"><i class="fas fa-paper-plane"></i> Kirim Pengumuman</button>
+      </div>
+    </div>
+
+    <div id="tab-admin" class="tab-content">
+      <div class="table-container">
+        <h3><i class="fas fa-users-cog"></i> Manajemen Pengguna</h3>
+        <div class="admin-management">
+          <h4><i class="fas fa-user-plus"></i> Tambah Pengguna Baru</h4>
+          <div class="form-row">
+            <input type="text" id="newUsername" placeholder="Username (Login ID)">
+            <input type="password" id="newPassword" placeholder="Password">
+          </div>
+          <div class="form-row">
+            <input type="text" id="newFullName" placeholder="Nama Lengkap">
+            <select id="newRole">
+              <option value="siswa">Siswa</option>
+              <option value="guru">Guru</option>
+              <option value="ortu">Orang Tua</option>
+              <option value="admin">🛡️ Admin (Rekan Pengawas)</option>
+            </select>
+          </div>
+          <div class="form-row-3" id="siswaFields">
+            <input type="text" id="newNIS" placeholder="NIS">
+            <input type="text" id="newNamaPanggilan" placeholder="Nama Panggilan">
+            <select id="newKelas">
+              <option value="X TKJ">X TKJ</option>
+              <option value="X DKV">X DKV</option>
+              <option value="X AKL">X AKL</option>
+              <option value="XI TKJ">XI TKJ</option>
+              <option value="XI DKV">XI DKV</option>
+              <option value="XI AKL">XI AKL</option>
+              <option value="XII TKJ">XII TKJ</option>
+              <option value="XII DKV">XII DKV</option>
+              <option value="XII AKL">XII AKL</option>
+            </select>
+          </div>
+          <div class="form-row-3" id="siswaFields2">
+            <input type="text" id="newTempatLahir" placeholder="Tempat Lahir">
+            <input type="date" id="newTanggalLahir">
+            <select id="newJenisKelamin">
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+          <div class="form-row-3" id="siswaFields3">
+            <input type="text" id="newAlamat" placeholder="Alamat Rumah">
+            <input type="text" id="newNoTelp" placeholder="No. Telepon">
+            <input type="text" id="newEkskul" placeholder="Ekskul">
+          </div>
+          <div class="form-row" id="siswaFields4">
+            <input type="text" id="newNamaOrtu" placeholder="Nama Orang Tua/Wali">
+            <input type="text" id="newNoTelpOrtu" placeholder="No. Telepon Orang Tua">
+          </div>
+          <div class="form-row" id="guruFields" style="display:none;">
+            <input type="text" id="newNIP" placeholder="NIP">
+            <input type="text" id="newMapel" placeholder="Mata Pelajaran">
+          </div>
+          <div class="form-row" id="ortuFields" style="display:none;">
+            <select id="newAnakUsername">
+              <option value="">-- Pilih Siswa --</option>
+            </select>
+            <input type="text" id="newHubungan" placeholder="Hubungan (Ibu/Ayah/Wali)">
+          </div>
+          <div class="form-row" id="adminFields" style="display:none;">
+            <input type="text" id="newJabatan" placeholder="Jabatan (cth: Wakil Kepala Sekolah)">
+            <input type="text" id="newNoTelpAdmin" placeholder="No. Telepon Admin">
+          </div>
+          <button onclick="addUserFull()"><i class="fas fa-save"></i> Tambah Pengguna</button>
+          <button onclick="clearForm()" class="btn-secondary"><i class="fas fa-eraser"></i> Bersihkan</button>
+        </div>
+
+        <div class="admin-management">
+          <h4><i class="fas fa-list"></i> Daftar Pengguna Terdaftar</h4>
+          <div id="userList"></div>
+        </div>
+
+        <div class="admin-management">
+          <h4><i class="fas fa-database"></i> Statistik Website</h4>
+          <div id="websiteStats"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   STATE MANAGEMENT
+   ============================================================ */
+const STORAGE_KEY = 'smk_avicena_state_v4';
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) { console.warn('Load state failed', e); }
+  return null;
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      users: USERS,
+      tasks: DATA_TASKS,
+      info: DATA_INFO,
+      attendance: DATA_ATTENDANCE,
+      grades: DATA_GRADES,
+      submissions: DATA_SUBMISSIONS
+    }));
+  } catch(e) {
+    console.warn('Save state failed', e);
+    if (e.name === 'QuotaExceededError') {
+      toast('⚠️ Penyimpanan penuh! Hapus beberapa file tugas lama.', 'error');
+    }
+  }
+}
+
+/* ============================================================
+   INITIAL DATA
+   ============================================================ */
+const defaultUsers = {
+  admin: { password:'admin123', role:'admin', name:'Staff Admin', fullName:'Administrator Sistem', jabatan:'Super Admin', noTelp:'-' },
+  budi: { password:'guru123', role:'guru', name:'Bpk. Budi Santoso, S.Kom.', fullName:'Budi Santoso', nip:'1987654321', mapel:'Pemrograman Web & Basis Data' },
+  ahmad: { password:'siswa123', role:'siswa', name:'Ahmad Fauzi', fullName:'Ahmad Fauzi', nis:'2024001', kelas:'X TKJ', tempatLahir:'Jakarta', tanggalLahir:'2006-05-15', jenisKelamin:'Laki-laki', alamat:'Jl. Raya Rajeg No. 123', noTelp:'081234567890', ekskul:'Futsal', namaOrtu:'Siti Rahayu', noTelpOrtu:'081298765432' },
+  siti: { password:'ortu123', role:'ortu', name:'Ibu Siti Rahayu', fullName:'Siti Rahayu', anakUsername:'ahmad', anak:'Ahmad Fauzi', hubungan:'Ibu' }
+};
+
+let DATA_TASKS = [];
+let DATA_INFO = [];
+let DATA_SCHEDULE = [];
+let DATA_ATTENDANCE = [];
+let DATA_GRADES = [];
+let DATA_SUBMISSIONS = {};
+
+let USERS = JSON.parse(JSON.stringify(defaultUsers));
+
+/* ============================================================
+   DATA JADWAL PELAJARAN LENGKAP
+   ============================================================ */
+const JAM_SLOT = [
+  { mulai:'07:00', selesai:'07:45' },
+  { mulai:'07:45', selesai:'08:30' },
+  { mulai:'08:30', selesai:'09:15' },
+  { mulai:'09:15', selesai:'09:30' },
+  { mulai:'09:30', selesai:'10:00', istirahat:true, label:'ISTIRAHAT 1' },
+  { mulai:'10:00', selesai:'10:45' },
+  { mulai:'10:45', selesai:'11:30' },
+  { mulai:'11:30', selesai:'12:00' },
+  { mulai:'12:00', selesai:'13:00', istirahat:true, label:'ISTIRAHAT 2 (ISHOMA)' },
+  { mulai:'13:00', selesai:'13:45' },
+  { mulai:'13:45', selesai:'14:30' },
+  { mulai:'14:30', selesai:'15:00' }
+];
+
+function generateSchedule(kelas, jurusan, mapelJurusan, mapelUmum) {
+  const jadwal = {};
+  const hariList = ['Senin','Selasa','Rabu','Kamis','Jumat'];
+
+  const seedMap = {
+    'X TKJ': 1, 'X DKV': 2, 'X AKL': 3,
+    'XI TKJ': 4, 'XI DKV': 5, 'XI AKL': 6,
+    'XII TKJ': 7, 'XII DKV': 8, 'XII AKL': 9
+  };
+  const seed = seedMap[kelas] || 1;
+
+  function seededShuffle(arr, offset) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = (i * 7 + offset * 13 + seed * 17) % (i + 1);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  hariList.forEach((hari, hIdx) => {
+    const jurusanHariIni = [];
+    for (let j = 0; j < 1 + (hIdx % 2); j++) {
+      jurusanHariIni.push(mapelJurusan[(j + hIdx + seed) % mapelJurusan.length]);
+    }
+
+    const totalSlotEfektif = 10 - jurusanHariIni.length;
+    const umumShuffled = seededShuffle(mapelUmum, hIdx + seed);
+
+    let pool = [
+      ...jurusanHariIni.map(m => ({ mapel:m, tipe:'jurusan' })),
+      ...umumShuffled.slice(0, totalSlotEfektif).map(m => ({ mapel:m, tipe:'umum' }))
+    ];
+
+    pool = seededShuffle(pool.map((_,i)=>i), hIdx).map(i => pool[i]).slice(0, 10);
+
+    const jadwalHari = [];
+    let poolIdx = 0;
+    JAM_SLOT.forEach((slot) => {
+      if (slot.istirahat) {
+        jadwalHari.push({ ...slot, mapel:'—', tipe:'istirahat' });
+      } else {
+        const item = pool[poolIdx] || { mapel:'—', tipe:'umum' };
+        jadwalHari.push({ ...slot, mapel: item.mapel, tipe: item.tipe });
+        poolIdx++;
+      }
+    });
+
+    jadwal[hari] = jadwalHari;
+  });
+
+  return jadwal;
+}
+
+const DATA_JADWAL = {
+  'X TKJ': generateSchedule('X TKJ', 'TKJ',
+    ['K.K TKJ', 'K.K TKJ', 'K.K TKJ', 'K.K TKJ', 'K.K TKJ'],
+    ['Matematika', 'Bahasa Inggris', 'HTML', 'PPKn', 'Pendidikan Agama Islam', 'Bahasa Indonesia']
+  ),
+  'X DKV': generateSchedule('X DKV', 'DKV',
+    ['K.K DKV', 'K.K DKV', 'K.K DKV', 'K.K DKV', 'K.K DKV'],
+    ['Matematika', 'Bahasa Inggris', 'Dasar Desain', 'PPKn', 'Pendidikan Agama Islam', 'Bahasa Indonesia']
+  ),
+  'X AKL': generateSchedule('X AKL', 'AKL',
+    ['K.K AKL', 'K.K AKL', 'K.K AKL', 'K.K AKL', 'K.K AKL'],
+    ['Matematika', 'Bahasa Inggris', 'Ekonomi', 'PPKn', 'Pendidikan Agama Islam', 'Bahasa Indonesia']
+  ),
+  'XI TKJ': generateSchedule('XI TKJ', 'TKJ',
+    ['K.K TKJ', 'T.J Kabel', 'HTML', 'Bootstrap', 'K.K TKJ'],
+    ['Matematika', 'Bahasa Inggris', 'Bahasa Indonesia', 'Pendidikan Agama Islam', 'PPKn']
+  ),
+  'XI DKV': generateSchedule('XI DKV', 'DKV',
+    ['K.K DKV', 'Desain Grafis', 'Ilustrasi', 'Fotografi', 'K.K DKV'],
+    ['Matematika', 'Bahasa Inggris', 'Bahasa Indonesia', 'Pendidikan Agama Islam', 'PPKn']
+  ),
+  'XI AKL': generateSchedule('XI AKL', 'AKL',
+    ['K.K AKL', 'Akuntansi Dasar', 'Perbankan', 'Pajak', 'K.K AKL'],
+    ['Matematika', 'Bahasa Inggris', 'Bahasa Indonesia', 'Pendidikan Agama Islam', 'PPKn']
+  ),
+  'XII TKJ': generateSchedule('XII TKJ', 'TKJ',
+    ['K.K TKJ', 'T.J Kabel', 'Robotik', 'K.K TKJ', 'K.K TKJ'],
+    ['Matematika', 'Bahasa Inggris', 'Bahasa Indonesia', 'PPKn', 'Pendidikan Agama Islam']
+  ),
+  'XII DKV': generateSchedule('XII DKV', 'DKV',
+    ['K.K DKV', 'Desain Grafis', 'Ilustrasi', 'Fotografi', 'Animasi'],
+    ['Matematika', 'Bahasa Inggris', 'Bahasa Indonesia', 'PPKn', 'Pendidikan Agama Islam']
+  ),
+  'XII AKL': generateSchedule('XII AKL', 'AKL',
+    ['K.K AKL', 'Akuntansi Dasar', 'Perbankan', 'Pajak', 'Audit'],
+    ['Matematika', 'Bahasa Inggris', 'Bahasa Indonesia', 'PPKn', 'Pendidikan Agama Islam']
+  )
+};
+
+function seedInitialData() {
+  DATA_TASKS = [
+    { id:'T1', judul:'Membuat Landing Page', mapel:'Pemrograman Web', kelas:'XII TKJ', deadline: addDays(7), deskripsi:'Buat landing page responsive dengan HTML & CSS', guru:'budi', createdAt: new Date().toISOString(), attachment:null },
+    { id:'T2', judul:'Latihan Query SQL', mapel:'Basis Data', kelas:'XI TKJ', deadline: addDays(3), deskripsi:'Kerjakan 20 soal query SELECT', guru:'budi', createdAt: new Date().toISOString(), attachment:null },
+    { id:'T3', judul:'Desain Poster Digital', mapel:'Desain Grafis', kelas:'X DKV', deadline: addDays(5), deskripsi:'Buat poster promosi sekolah', guru:'budi', createdAt: new Date().toISOString(), attachment:null }
+  ];
+  DATA_INFO = [
+    { id:'I1', tanggal: today(), judul:'Selamat Datang di Portal Akademik', isi:'Sistem siap digunakan. Silakan cek jadwal dan tugas terbaru.' },
+    { id:'I2', tanggal: today(), judul:'Ujian Tengah Semester', isi:'UTS akan dilaksanakan minggu depan. Persiapkan diri dengan baik.' }
+  ];
+  DATA_ATTENDANCE = [
+    { username:'ahmad', tanggal: addDays(-1), status:'Hadir' },
+    { username:'ahmad', tanggal: addDays(-2), status:'Hadir' },
+    { username:'ahmad', tanggal: addDays(-3), status:'Izin' }
+  ];
+  DATA_GRADES = [
+    { username:'ahmad', mapel:'K.K TKJ', nilai:88, semester:'Ganjil 2025/2026' },
+    { username:'ahmad', mapel:'Matematika', nilai:85, semester:'Ganjil 2025/2026' },
+    { username:'ahmad', mapel:'Bahasa Inggris', nilai:78, semester:'Ganjil 2025/2026' }
+  ];
+  DATA_SUBMISSIONS = {};
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+function addDays(n) { const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
+function formatDate(d) {
+  if (!d) return '-';
+  try { return new Date(d).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }); }
+  catch { return d; }
+}
+
+/* ============================================================
+   LOAD / SAVE
+   ============================================================ */
+const saved = loadState();
+if (saved) {
+  USERS = saved.users || JSON.parse(JSON.stringify(defaultUsers));
+  DATA_TASKS = saved.tasks || [];
+  DATA_INFO = saved.info || [];
+  DATA_ATTENDANCE = saved.attendance || [];
+  DATA_GRADES = saved.grades || [];
+  DATA_SUBMISSIONS = saved.submissions || {};
+} else {
+  seedInitialData();
+  saveState();
+}
+
+/* ============================================================
+   HELPER: Relasi ortu → siswa
+   ============================================================ */
+function getAnakFromOrtu(ortuUsername) {
+  const ortu = USERS[ortuUsername];
+  if (!ortu || ortu.role !== 'ortu') return null;
+
+  if (ortu.anakUsername && USERS[ortu.anakUsername] && USERS[ortu.anakUsername].role === 'siswa') {
+    return { username: ortu.anakUsername, data: USERS[ortu.anakUsername] };
+  }
+
+  if (ortu.anak) {
+    const found = Object.entries(USERS).find(([k,v]) =>
+      v.role === 'siswa' && (v.fullName === ortu.anak || v.name === ortu.anak)
+    );
+    if (found) return { username: found[0], data: found[1] };
+  }
+  return null;
+}
+
+/* ============================================================
+   FILE READER HELPER
+   ============================================================ */
+function readFileAsDataURL(file, callback) {
+  if (!file) return callback(null);
+  if (file.size > 2 * 1024 * 1024) {
+    toast('⚠️ Ukuran file maksimal 2MB!', 'error');
+    return callback(null);
+  }
+  const reader = new FileReader();
+  reader.onload = e => callback({ name: file.name, type: file.type, dataUrl: e.target.result });
+  reader.onerror = () => { toast('❌ Gagal membaca file!', 'error'); callback(null); };
+  reader.readAsDataURL(file);
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(2) + ' MB';
+}
+
+/* ============================================================
+   AUTH & SESSION
+   ============================================================ */
+let currentUser = null;
+let currentUsername = '';
+let sessionTimeout = null;
+
+function handleLogin() {
+  const adminPanel = document.getElementById('adminLoginPanel');
+  const isAdminMode = adminPanel && adminPanel.style.display !== 'none';
+
+  const role = isAdminMode ? 'admin' : document.getElementById('roleSelect').value;
+
+  const username = document.getElementById('usernameInput').value.trim().toLowerCase();
+  const password = document.getElementById('passwordInput').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+
+  if (!username || !password) return showLoginError('❌ Username dan password wajib diisi!');
+  if (!USERS[username]) return showLoginError('❌ Username tidak ditemukan!');
+  if (USERS[username].password !== password) return showLoginError('❌ Password salah!');
+  if (USERS[username].role !== role) {
+    if (isAdminMode) return showLoginError('❌ Akun ini bukan admin!');
+    return showLoginError('❌ Role tidak sesuai dengan akun!');
+  }
+
+  currentUsername = username;
+  currentUser = role;
+
+  document.getElementById('loginScreen').classList.add('hide');
+  document.getElementById('appContent').classList.add('show');
+  document.getElementById('displayName').textContent = USERS[username].fullName || USERS[username].name;
+  document.getElementById('displayRole').textContent = role.toUpperCase();
+
+  const isGuruOrAdmin = role === 'guru' || role === 'admin';
+  document.getElementById('teacherTaskForm').style.display = isGuruOrAdmin ? 'block' : 'none';
+  document.getElementById('teacherAbsenForm').style.display = isGuruOrAdmin ? 'block' : 'none';
+  document.getElementById('adminInfoForm').style.display = role === 'admin' ? 'block' : 'none';
+  document.querySelectorAll('.admin-tab').forEach(t => t.style.display = role === 'admin' ? 'block' : 'none');
+  document.querySelectorAll('.teacher-tab').forEach(t => t.style.display = isGuruOrAdmin ? 'block' : 'none');
+
+  const filterContainer = document.getElementById('jadwalFilterContainer');
+  if (filterContainer) filterContainer.style.display = isGuruOrAdmin ? 'block' : 'none';
+
+  const absenTgl = document.getElementById('absenTanggal');
+  if (absenTgl) absenTgl.value = today();
+
+  resetSessionTimer();
+  renderAll();
+  toast(`Selamat datang, ${USERS[username].fullName || username}!`, 'success');
+
+  if (adminPanel) adminPanel.style.display = 'none';
+}
+
+function showLoginError(msg) {
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = msg;
+  errEl.classList.add('show');
+}
+
+function resetSessionTimer() {
+  if (sessionTimeout) clearTimeout(sessionTimeout);
+  sessionTimeout = setTimeout(() => {
+    if (currentUser) {
+      toast('Sesi berakhir karena tidak ada aktivitas. Silakan login ulang.', 'warning');
+      handleLogout();
+    }
+  }, 30 * 60 * 1000);
+}
+
+['click','keydown','mousemove'].forEach(evt => {
+  document.addEventListener(evt, () => { if (currentUser) resetSessionTimer(); });
+});
+
+function handleLogout() {
+  if (sessionTimeout) clearTimeout(sessionTimeout);
+  currentUser = null;
+  currentUsername = '';
+  document.getElementById('loginScreen').classList.remove('hide');
+  document.getElementById('appContent').classList.remove('show');
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.tab-btn[data-tab="dashboard"]').classList.add('active');
+  document.getElementById('tab-dashboard').classList.add('active');
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('usernameInput').value = '';
+
+  const adminPanel = document.getElementById('adminLoginPanel');
+  if (adminPanel) adminPanel.style.display = 'none';
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function toast(msg, type='success') {
+  const icons = { success:'fa-check-circle', error:'fa-times-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="fas ${icons[type]||icons.info}"></i><span>${msg}</span>`;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity 0.3s, transform 0.3s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(400px)';
+    setTimeout(() => el.remove(), 300);
+  }, 3200);
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function showModal(title, bodyHtml, onConfirm, confirmText='Simpan') {
+  const container = document.getElementById('modalContainer');
+  container.innerHTML = `
+    <div class="modal-overlay show" id="modalOverlay">
+      <div class="modal">
+        <h3>${title}</h3>
+        <div id="modalBody">${bodyHtml}</div>
+        <div class="modal-actions">
+          <button class="btn-secondary" onclick="closeModal()">Batal</button>
+          <button class="btn-primary" id="modalConfirm">${confirmText}</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalConfirm').onclick = () => {
+    if (onConfirm() !== false) closeModal();
+  };
+  document.getElementById('modalOverlay').onclick = (e) => {
+    if (e.target.id === 'modalOverlay') closeModal();
+  };
+}
+function closeModal() {
+  document.getElementById('modalContainer').innerHTML = '';
+}
+
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
+function renderAll() {
+  renderDashboard();
+  renderSchedule();
+  renderTasks();
+  renderGrades();
+  renderAttendance();
+  renderInfo();
+  if (currentUser === 'guru' || currentUser === 'admin') {
+    renderSubmissionList();
+  }
+  if (currentUser === 'admin') renderAdminPanel();
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard() {
+  const stats = document.getElementById('dashboardStats');
+  const recent = document.getElementById('recentActivity');
+
+  if (currentUser === 'siswa') {
+    const u = USERS[currentUsername];
+    const tugasKelas = DATA_TASKS.filter(t => t.kelas === u.kelas);
+    const submissions = DATA_SUBMISSIONS[currentUsername] || {};
+    const done = tugasKelas.filter(t => submissions[t.id]?.status === 'Selesai').length;
+    const pending = tugasKelas.length - done;
+    const behavior = 100;
+
+    stats.innerHTML = `
+      <div class="stat-card"><i class="fas fa-id-card"></i><div class="stat-detail"><span class="stat-label">NIS</span><span class="stat-value">${u.nis||'-'}</span></div></div>
+      <div class="stat-card"><i class="fas fa-book"></i><div class="stat-detail"><span class="stat-label">Kelas</span><span class="stat-value">${u.kelas||'-'}</span></div></div>
+      <div class="stat-card"><i class="fas fa-tasks"></i><div class="stat-detail"><span class="stat-label">Tugas Aktif</span><span class="stat-value">${pending}/${tugasKelas.length}</span></div></div>
+      <div class="stat-card"><i class="fas fa-star"></i><div class="stat-detail"><span class="stat-label">Skor Kelakuan</span><span class="stat-value">${behavior}</span></div></div>
+    `;
+
+    const aktivitas = [];
+    tugasKelas.slice(0,3).forEach(t => {
+      const sub = submissions[t.id];
+      const sudahDinilai = sub?.nilai !== null && sub?.nilai !== undefined;
+      aktivitas.push(`<li><i class="fas ${sub?.status==='Selesai'?'fa-check-circle" style="color:var(--success)':'fa-hourglass-half" style="color:var(--warning)'}"></i> ${t.judul} — ${sudahDinilai?'Nilai: '+sub.nilai:(sub?.status||'Belum dikerjakan')}</li>`);
+    });
+    recent.innerHTML = aktivitas.length ? `<ul style="list-style:none; padding:0; line-height:2;">${aktivitas.join('')}</ul>` : `<div class="empty-state"><i class="fas fa-inbox"></i><p>Belum ada aktivitas.</p></div>`;
+
+  } else if (currentUser === 'guru') {
+    const u = USERS[currentUsername];
+    const tugasSaya = DATA_TASKS.filter(t => t.guru === currentUsername);
+    const siswaAktif = Object.values(USERS).filter(x => x.role==='siswa').length;
+    
+    let submissionCount = 0;
+    tugasSaya.forEach(t => {
+      Object.values(DATA_SUBMISSIONS).forEach(subs => {
+        if (subs[t.id]) submissionCount++;
+      });
+    });
+    const belumDinilai = (() => {
+      let count = 0;
+      tugasSaya.forEach(t => {
+        Object.values(DATA_SUBMISSIONS).forEach(subs => {
+          const sub = subs[t.id];
+          if (sub && (sub.nilai === null || sub.nilai === undefined)) count++;
+        });
+      });
+      return count;
+    })();
+
+    stats.innerHTML = `
+      <div class="stat-card"><i class="fas fa-chalkboard-user"></i><div class="stat-detail"><span class="stat-label">NIP</span><span class="stat-value">${u.nip||'-'}</span></div></div>
+      <div class="stat-card"><i class="fas fa-file-pen"></i><div class="stat-detail"><span class="stat-label">Tugas Dibuat</span><span class="stat-value">${tugasSaya.length}</span></div></div>
+      <div class="stat-card"><i class="fas fa-inbox"></i><div class="stat-detail"><span class="stat-label">Submission</span><span class="stat-value">${submissionCount}</span></div></div>
+      <div class="stat-card"><i class="fas fa-hourglass-half"></i><div class="stat-detail"><span class="stat-label">Belum Dinilai</span><span class="stat-value" style="color:${belumDinilai>0?'var(--danger)':'var(--success)'};">${belumDinilai}</span></div></div>
+    `;
+
+    recent.innerHTML = tugasSaya.length ? `<ul style="list-style:none; padding:0; line-height:2;">
+      ${tugasSaya.slice(0,5).map(t => {
+        const count = Object.values(DATA_SUBMISSIONS).filter(s => s[t.id]).length;
+        return `<li><i class="fas fa-paper-plane" style="color:var(--primary)"></i> <strong>${t.judul}</strong> — ${t.kelas} (${count} submission)</li>`;
+      }).join('')}
+    </ul>` : `<div class="empty-state"><i class="fas fa-inbox"></i><p>Belum ada tugas yang dibuat.</p></div>`;
+
+  } else if (currentUser === 'ortu') {
+    const u = USERS[currentUsername];
+    const anakRel = getAnakFromOrtu(currentUsername);
+    const anakUsername = anakRel?.username;
+    const anak = anakRel?.data;
+
+    stats.innerHTML = `
+      <div class="stat-card"><i class="fas fa-user"></i><div class="stat-detail"><span class="stat-label">Nama Anak</span><span class="stat-value" style="font-size:1.1rem;">${anak?.fullName||u.anak||'-'}</span></div></div>
+      <div class="stat-card"><i class="fas fa-users"></i><div class="stat-detail"><span class="stat-label">Hubungan</span><span class="stat-value">${u.hubungan||'-'}</span></div></div>
+      <div class="stat-card"><i class="fas fa-star"></i><div class="stat-detail"><span class="stat-label">Kehadiran</span><span class="stat-value">${anakUsername?calcAttendanceRate(anakUsername):'-'}</span></div></div>
+      <div class="stat-card"><i class="fas fa-graduation-cap"></i><div class="stat-detail"><span class="stat-label">Kelas</span><span class="stat-value">${anak?.kelas||'-'}</span></div></div>
+    `;
+
+    if (anakUsername) {
+      const grades = DATA_GRADES.filter(g => g.username === anakUsername);
+      const rata = grades.length ? (grades.reduce((s,g)=>s+g.nilai,0)/grades.length).toFixed(1) : '-';
+      recent.innerHTML = `
+        <p style="margin-bottom:0.8rem;"><strong>Ringkasan akademik ${anak.fullName||anak.name}:</strong></p>
+        <ul style="list-style:none; padding:0; line-height:2;">
+          <li>📚 Rata-rata nilai: <strong>${rata}</strong></li>
+          <li>✅ Kehadiran: <strong>${calcAttendanceRate(anakUsername)}</strong></li>
+          <li>📝 Tugas selesai: <strong>${Object.values(DATA_SUBMISSIONS[anakUsername]||{}).filter(s=>s.status==='Selesai').length}</strong></li>
+          <li>🏃 Ekskul: <strong>${anak.ekskul||'-'}</strong></li>
+        </ul>
+      `;
+    } else {
+      recent.innerHTML = `<div class="empty-state"><i class="fas fa-info-circle"></i><p>Data anak belum terhubung. Hubungi admin.</p></div>`;
+    }
+
+  } else if (currentUser === 'admin') {
+    const totalUsers = Object.keys(USERS).length;
+    const totalSiswa = Object.values(USERS).filter(u=>u.role==='siswa').length;
+    const totalGuru = Object.values(USERS).filter(u=>u.role==='guru').length;
+    const totalAdmin = Object.values(USERS).filter(u=>u.role==='admin').length;
+
+    stats.innerHTML = `
+      <div class="stat-card"><i class="fas fa-users"></i><div class="stat-detail"><span class="stat-label">Total Pengguna</span><span class="stat-value">${totalUsers}</span></div></div>
+      <div class="stat-card"><i class="fas fa-user-graduate"></i><div class="stat-detail"><span class="stat-label">Siswa</span><span class="stat-value">${totalSiswa}</span></div></div>
+      <div class="stat-card"><i class="fas fa-chalkboard-teacher"></i><div class="stat-detail"><span class="stat-label">Guru</span><span class="stat-value">${totalGuru}</span></div></div>
+      <div class="stat-card"><i class="fas fa-user-shield"></i><div class="stat-detail"><span class="stat-label">Admin</span><span class="stat-value">${totalAdmin}</span></div></div>
+    `;
+
+    recent.innerHTML = `
+      <ul style="list-style:none; padding:0; line-height:2;">
+        <li><i class="fas fa-check-circle" style="color:var(--success)"></i> Sistem berjalan normal.</li>
+        <li><i class="fas fa-database" style="color:var(--primary)"></i> Total ${totalUsers} pengguna terdaftar.</li>
+        <li><i class="fas fa-file-pen" style="color:var(--primary)"></i> ${DATA_TASKS.length} tugas aktif.</li>
+        <li><i class="fas fa-bullhorn" style="color:var(--primary)"></i> ${DATA_INFO.length} pengumuman.</li>
+        <li><i class="fas fa-calendar-alt" style="color:var(--primary)"></i> ${Object.keys(DATA_JADWAL).length} jadwal kelas tersedia.</li>
+      </ul>
+    `;
+  }
+}
+
+function calcAttendanceRate(username) {
+  const records = DATA_ATTENDANCE.filter(a => a.username === username);
+  if (!records.length) return '-';
+  const hadir = records.filter(r => r.status === 'Hadir').length;
+  return Math.round((hadir / records.length) * 100) + '%';
+}
+
+/* ---------- JADWAL ---------- */
+function renderSchedule() {
+  const container = document.getElementById('scheduleTable');
+  let kelasAktif;
+
+  if (currentUser === 'siswa') {
+    kelasAktif = USERS[currentUsername]?.kelas;
+    if (!kelasAktif || !DATA_JADWAL[kelasAktif]) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Jadwal untuk kelas ${kelasAktif||'-'} belum tersedia.</p></div>`;
+      return;
+    }
+  } else {
+    const select = document.getElementById('jadwalKelasSelect');
+    kelasAktif = select?.value || 'X TKJ';
+  }
+
+  const jadwalKelas = DATA_JADWAL[kelasAktif];
+  if (!jadwalKelas) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Data jadwal tidak ditemukan.</p></div>`;
+    return;
+  }
+
+  const hariList = ['Senin','Selasa','Rabu','Kamis','Jumat'];
+
+  let html = `<div style="margin-bottom:1rem; padding:0.8rem 1.2rem; background:#f4f9ff; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+    <strong style="color:var(--primary); font-size:1.1rem;"><i class="fas fa-school"></i> Kelas ${kelasAktif}</strong>
+    <span style="font-size:0.85rem; color:var(--text-muted);">
+      <i class="fas fa-clock"></i> 07:00 – 15:00 · 
+      <i class="fas fa-mug-hot"></i> Istirahat 09:30–10:00 & 12:00–13:00
+    </span>
+  </div>`;
+
+  html += `<table class="schedule-table">
+    <thead>
+      <tr>
+        <th style="width:100px;">Jam</th>
+        ${hariList.map(h => `<th>${h}</th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>`;
+
+  JAM_SLOT.forEach((slot, idx) => {
+    if (slot.istirahat) {
+      html += `<tr class="istirahat-row">
+        <td class="jam-col">${slot.mulai} – ${slot.selesai}</td>
+        <td colspan="5"><i class="fas fa-mug-hot"></i> ${slot.label}</td>
+      </tr>`;
+    } else {
+      html += `<tr>
+        <td class="jam-col">${slot.mulai} – ${slot.selesai}</td>
+        ${hariList.map(hari => {
+          const item = jadwalKelas[hari]?.[idx];
+          if (!item || item.mapel === '—') {
+            return `<td class="mapel-cell" style="color:#ccc;">—</td>`;
+          }
+          const cls = item.tipe === 'jurusan' ? 'mapel-jurusan' : 'mapel-umum';
+          return `<td class="mapel-cell"><span class="${cls}">${item.mapel}</span></td>`;
+        }).join('')}
+      </tr>`;
+    }
+  });
+
+  html += `</tbody></table>`;
+
+  html += `<div style="margin-top:1.5rem;">
+    <h4 style="color:var(--primary); margin-bottom:0.8rem;"><i class="fas fa-star"></i> Mata Pelajaran Jurusan (Setiap Hari)</h4>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.8rem;">
+      ${hariList.map(hari => {
+        const mapelJurusan = jadwalKelas[hari].filter(s => s.tipe === 'jurusan' && s.mapel !== '—').map(s => s.mapel);
+        const unik = [...new Set(mapelJurusan)];
+        return `<div style="background:#f8fbff; padding:0.8rem 1rem; border-radius:12px; border-left:4px solid var(--primary);">
+          <strong style="font-size:0.85rem; color:var(--primary);">${hari}</strong>
+          <div style="font-size:0.8rem; margin-top:4px; color:var(--text);">${unik.join(', ') || '-'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+/* ---------- TUGAS ---------- */
+function renderTasks() {
+  const container = document.getElementById('taskList');
+  let tasks = DATA_TASKS;
+
+  if (currentUser === 'siswa') {
+    const kelas = USERS[currentUsername]?.kelas;
+    tasks = tasks.filter(t => t.kelas === kelas);
+  } else if (currentUser === 'guru') {
+    tasks = tasks.filter(t => t.guru === currentUsername);
+  }
+
+  if (!tasks.length) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-tasks"></i><p>Belum ada tugas.</p></div>`;
+    return;
+  }
+
+  const submissions = DATA_SUBMISSIONS[currentUsername] || {};
+  const isSiswa = currentUser === 'siswa';
+
+  container.innerHTML = tasks.map(t => {
+    const sub = submissions[t.id];
+    const isDone = sub?.status === 'Selesai';
+    const isOverdue = new Date(t.deadline) < new Date() && !isDone;
+    const cls = isDone ? 'done' : (isOverdue ? 'overdue' : '');
+    const sudahDinilai = sub?.nilai !== null && sub?.nilai !== undefined;
+
+    let badge = isDone 
+      ? (sudahDinilai 
+          ? `<span class="badge badge-success">✓ Nilai: ${sub.nilai}</span>`
+          : '<span class="badge badge-info">Dikumpulkan</span>')
+      : isOverdue ? '<span class="badge badge-danger">Terlambat</span>' 
+                  : '<span class="badge badge-warning">Aktif</span>';
+
+    let attachmentBadge = t.attachment 
+      ? `<a href="${t.attachment.dataUrl}" download="${t.attachment.name}" style="font-size:0.8rem; color:var(--primary); display:inline-block; margin-top:4px;">
+           📎 ${t.attachment.name}
+         </a>`
+      : '';
+
+    let nilaiInfo = '';
+    if (isDone && sudahDinilai) {
+      nilaiInfo = `
+        <div style="background:#d4edda; padding:8px 12px; border-radius:8px; margin-top:8px; font-size:0.85rem;">
+          <strong style="color:#155724;">🎯 Nilai: ${sub.nilai}</strong>
+          ${sub.feedback ? `<div style="margin-top:4px; color:#155724;"><em>"${sub.feedback}"</em></div>` : ''}
+        </div>`;
+    }
+
+    let submissionInfo = '';
+    if (!isSiswa) {
+      const count = Object.values(DATA_SUBMISSIONS).filter(s => s[t.id]).length;
+      const graded = Object.values(DATA_SUBMISSIONS).filter(s => s[t.id] && s[t.id].nilai !== null && s[t.id].nilai !== undefined).length;
+      submissionInfo = `<div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+        <i class="fas fa-inbox"></i> ${count} dikumpulkan · ${graded} dinilai
+      </div>`;
+    }
+
+    return `<div class="task-item ${cls}">
+      <div style="flex:1; min-width:200px;">
+        <h4>${t.judul}</h4>
+        <small><i class="fas fa-book"></i> ${t.mapel} · <i class="fas fa-users"></i> ${t.kelas} · <i class="fas fa-calendar"></i> ${formatDate(t.deadline)}</small>
+        <p style="margin-top:6px; font-size:0.9rem; color:var(--text-muted);">${t.deskripsi||''}</p>
+        ${attachmentBadge}
+        ${submissionInfo}
+        ${nilaiInfo}
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+        ${badge}
+        ${isSiswa && !isDone ? `<button class="btn-primary btn-sm" onclick="openTaskModal('${t.id}')"><i class="fas fa-upload"></i> Upload Jawaban</button>` : ''}
+        ${isSiswa && isDone ? `<small style="color:var(--text-muted);">Dikirim ${formatDate(sub.submittedAt)}</small>` : ''}
+        ${!isSiswa ? `<button class="btn-danger btn-sm" onclick="deleteTask('${t.id}')"><i class="fas fa-trash"></i></button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   SUBMISSION LIST (untuk guru/admin menilai)
+   ============================================================ */
+function renderSubmissionList() {
+  const container = document.getElementById('submissionList');
+  if (!container) return;
+
+  const myTasks = currentUser === 'admin' 
+    ? DATA_TASKS 
+    : DATA_TASKS.filter(t => t.guru === currentUsername);
+
+  const items = [];
+  myTasks.forEach(t => {
+    Object.entries(DATA_SUBMISSIONS).forEach(([siswa, subs]) => {
+      if (subs[t.id]) {
+        items.push({ task: t, siswa, sub: subs[t.id] });
+      }
+    });
+  });
+
+  items.sort((a,b) => {
+    const aGraded = a.sub.nilai !== null && a.sub.nilai !== undefined;
+    const bGraded = b.sub.nilai !== null && b.sub.nilai !== undefined;
+    if (aGraded !== bGraded) return aGraded ? 1 : -1;
+    return new Date(b.sub.submittedAt) - new Date(a.sub.submittedAt);
+  });
+
+  if (!items.length) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Belum ada tugas yang dikumpulkan siswa.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = items.map(item => {
+    const siswaData = USERS[item.siswa];
+    const nama = siswaData?.fullName || siswaData?.name || item.siswa;
+    const sudahDinilai = item.sub.nilai !== null && item.sub.nilai !== undefined;
+    const badge = sudahDinilai 
+      ? `<span class="badge badge-success">Nilai: ${item.sub.nilai}</span>`
+      : `<span class="badge badge-warning">⏳ Belum Dinilai</span>`;
+
+    const fileBadge = item.sub.attachment 
+      ? `<i class="fas fa-paperclip" style="color:var(--primary);" title="Ada lampiran"></i>` 
+      : '';
+
+    return `<div class="task-item" style="border-left-color:${sudahDinilai?'var(--success)':'var(--warning)'};">
+      <div style="flex:1; min-width:200px;">
+        <h4>${item.task.judul} ${fileBadge}</h4>
+        <small>
+          <i class="fas fa-user"></i> <strong>${nama}</strong> · 
+          <i class="fas fa-users"></i> ${item.task.kelas} · 
+          <i class="fas fa-clock"></i> ${formatDate(item.sub.submittedAt)}
+        </small>
+        <p style="margin-top:6px; font-size:0.85rem; color:var(--text-muted);">
+          <em>"${(item.sub.jawaban||'').substring(0,80)}${(item.sub.jawaban||'').length>80?'...':''}"</em>
+        </p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+        ${badge}
+        <button class="btn-primary btn-sm" onclick="openGradeModal('${item.siswa}','${item.task.id}')">
+          <i class="fas fa-eye"></i> Buka & Nilai
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openGradeModal(siswaUsername, taskId) {
+  const task = DATA_TASKS.find(t => t.id === taskId);
+  const sub = DATA_SUBMISSIONS[siswaUsername]?.[taskId];
+  if (!task || !sub) return;
+
+  const siswaData = USERS[siswaUsername];
+  const nama = siswaData?.fullName || siswaData?.name || siswaUsername;
+
+  let fileHtml = '<p style="color:#999; font-size:0.85rem; font-style:italic;">Tidak ada file lampiran.</p>';
+  if (sub.attachment) {
+    const isImage = sub.attachment.type?.startsWith('image/');
+    if (isImage) {
+      fileHtml = `
+        <div style="text-align:center; margin-bottom:0.8rem;">
+          <img src="${sub.attachment.dataUrl}" style="max-width:100%; max-height:300px; border-radius:12px; border:1px solid #dce8f2; margin-bottom:8px;">
+          <br>
+          <a href="${sub.attachment.dataUrl}" download="${sub.attachment.name}" style="font-size:0.8rem; color:var(--primary);">
+            ⬇️ Download ${sub.attachment.name}
+          </a>
+        </div>`;
+    } else {
+      fileHtml = `
+        <div style="background:#f4f9ff; padding:1rem; border-radius:12px; margin-bottom:0.8rem; text-align:center;">
+          <i class="fas fa-file" style="font-size:2rem; color:var(--primary);"></i>
+          <p style="margin:0.5rem 0; font-size:0.9rem; word-break:break-all;">${sub.attachment.name}</p>
+          <a href="${sub.attachment.dataUrl}" download="${sub.attachment.name}" class="btn-primary btn-sm" style="text-decoration:none;">
+            <i class="fas fa-download"></i> Download File
+          </a>
+        </div>`;
+    }
+  }
+
+  const currentNilai = sub.nilai ?? '';
+  const currentFeedback = sub.feedback ?? '';
+
+  showModal(`📝 Nilai Tugas`, `
+    <div style="background:#f8fbff; padding:0.8rem; border-radius:12px; margin-bottom:1rem;">
+      <strong>${task.judul}</strong><br>
+      <small style="color:var(--text-muted);">
+        <i class="fas fa-user"></i> ${nama} · ${task.kelas}<br>
+        <i class="fas fa-clock"></i> Dikumpulkan: ${formatDate(sub.submittedAt)}
+      </small>
+    </div>
+    <strong style="font-size:0.9rem;">📎 Jawaban Siswa:</strong>
+    <p style="background:#fff; padding:0.8rem; border-radius:12px; border:1px solid #dce8f2; margin:0.4rem 0 0.8rem; font-size:0.9rem;">
+      ${sub.jawaban || '(tanpa catatan)'}
+    </p>
+    ${fileHtml}
+    <hr style="margin:1rem 0; border:none; border-top:1px dashed #dce8f2;">
+    <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">
+      <i class="fas fa-star"></i> Nilai (0-100)
+    </label>
+    <input type="number" id="gradeInput" min="0" max="100" value="${currentNilai}" placeholder="cth: 85">
+    <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">
+      <i class="fas fa-comment"></i> Feedback / Catatan (opsional)
+    </label>
+    <textarea id="feedbackInput" rows="2" placeholder="Catatan untuk siswa...">${currentFeedback}</textarea>
+  `, () => {
+    const nilai = parseInt(document.getElementById('gradeInput').value);
+    if (isNaN(nilai) || nilai < 0 || nilai > 100) {
+      toast('Nilai harus berupa angka 0-100!', 'error');
+      return false;
+    }
+    sub.nilai = nilai;
+    sub.feedback = document.getElementById('feedbackInput').value.trim();
+    sub.gradedBy = currentUsername;
+    sub.gradedAt = new Date().toISOString();
+    saveState();
+    toast(`✅ Nilai ${nilai} tersimpan untuk ${nama}!`, 'success');
+    renderAll();
+  }, '💾 Simpan Nilai');
+}
+
+/* ============================================================
+   SISWA: KERJAKAN TUGAS
+   ============================================================ */
+function openTaskModal(taskId) {
+  const task = DATA_TASKS.find(t => t.id === taskId);
+  if (!task) return;
+
+  let attachmentHtml = '';
+  if (task.attachment) {
+    const isImage = task.attachment.type?.startsWith('image/');
+    if (isImage) {
+      attachmentHtml = `
+        <div style="background:#f4f9ff; padding:0.8rem; border-radius:12px; margin-bottom:0.8rem; text-align:center;">
+          <strong style="font-size:0.85rem; display:block; margin-bottom:6px;">
+            <i class="fas fa-paperclip"></i> Lampiran Soal:
+          </strong>
+          <img src="${task.attachment.dataUrl}" style="max-width:100%; max-height:250px; border-radius:8px;">
+          <br>
+          <a href="${task.attachment.dataUrl}" download="${task.attachment.name}" style="font-size:0.8rem; color:var(--primary); display:inline-block; margin-top:6px;">
+            ⬇️ Download ${task.attachment.name}
+          </a>
+        </div>`;
+    } else {
+      attachmentHtml = `
+        <div style="background:#f4f9ff; padding:0.8rem; border-radius:12px; margin-bottom:0.8rem;">
+          <strong style="font-size:0.85rem;"><i class="fas fa-paperclip"></i> Lampiran Soal:</strong>
+          <a href="${task.attachment.dataUrl}" download="${task.attachment.name}" 
+             style="display:block; margin-top:4px; font-size:0.85rem; color:var(--primary);">
+            📎 ${task.attachment.name}
+          </a>
+        </div>`;
+    }
+  }
+
+  showModal(`Kerjakan: ${task.judul}`, `
+    ${attachmentHtml}
+    <p style="margin-bottom:0.8rem; color:var(--text-muted); font-size:0.9rem;">${task.deskripsi||''}</p>
+    <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">
+      <i class="fas fa-upload"></i> Upload Jawaban (file/gambar, max 2MB)
+    </label>
+    <input type="file" id="taskAnswerFile" accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar">
+    <label style="font-size:0.85rem; font-weight:600; display:block; margin-top:0.8rem; margin-bottom:4px;">
+      <i class="fas fa-pen"></i> Catatan tambahan (opsional)
+    </label>
+    <textarea id="taskAnswer" rows="3" placeholder="Tulis catatan untuk guru..."></textarea>
+  `, () => {
+    const note = document.getElementById('taskAnswer').value.trim();
+    const fileInput = document.getElementById('taskAnswerFile');
+
+    if ((!fileInput.files || !fileInput.files[0]) && !note) {
+      toast('Upload file atau tulis catatan dulu!', 'error');
+      return false;
+    }
+
+    const doSave = (fileData) => {
+      if (!DATA_SUBMISSIONS[currentUsername]) DATA_SUBMISSIONS[currentUsername] = {};
+      DATA_SUBMISSIONS[currentUsername][taskId] = {
+        status: 'Selesai',
+        submittedAt: new Date().toISOString(),
+        jawaban: note || '(tanpa catatan)',
+        attachment: fileData,
+        nilai: null,
+        feedback: null
+      };
+      saveState();
+      toast('✅ Tugas berhasil dikirim!', 'success');
+      renderAll();
+    };
+
+    if (fileInput.files && fileInput.files[0]) {
+      readFileAsDataURL(fileInput.files[0], doSave);
+    } else {
+      doSave(null);
+    }
+  }, '📤 Kirim Tugas');
+}
+
+/* ============================================================
+   GURU: KIRIM TUGAS
+   ============================================================ */
+function sendTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  const desc = document.getElementById('taskDesc').value.trim();
+  const kelas = document.getElementById('taskClass').value;
+  const deadline = document.getElementById('taskDeadline').value || addDays(7);
+  const fileInput = document.getElementById('taskAttachment');
+
+  if (!title) { toast('Judul tugas wajib diisi!', 'error'); return; }
+
+  const doSave = (fileData) => {
+    const newTask = {
+      id: 'T' + Date.now(),
+      judul: title,
+      mapel: USERS[currentUsername].mapel || 'Umum',
+      kelas, deadline,
+      deskripsi: desc || '-',
+      guru: currentUsername,
+      createdAt: new Date().toISOString(),
+      attachment: fileData
+    };
+    DATA_TASKS.push(newTask);
+    saveState();
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('taskDesc').value = '';
+    document.getElementById('taskDeadline').value = '';
+    if (fileInput) fileInput.value = '';
+    toast(`✅ Tugas "${title}" dikirim ke kelas ${kelas}!`, 'success');
+    renderAll();
+  };
+
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    readFileAsDataURL(fileInput.files[0], doSave);
+  } else {
+    doSave(null);
+  }
+}
+
+function deleteTask(id) {
+  if (!confirm('Yakin ingin menghapus tugas ini? Semua submission siswa juga akan terhapus.')) return;
+  DATA_TASKS = DATA_TASKS.filter(t => t.id !== id);
+  Object.keys(DATA_SUBMISSIONS).forEach(siswa => {
+    delete DATA_SUBMISSIONS[siswa][id];
+  });
+  saveState();
+  toast('Tugas dihapus.', 'info');
+  renderAll();
+}
+
+/* ---------- NILAI & PROFIL ---------- */
+function renderGrades() {
+  const container = document.getElementById('gradeTable');
+  const u = USERS[currentUsername];
+
+  document.getElementById('profileName').textContent = u.fullName || u.name || '-';
+
+  let behavior = '-', attendance = '-', grades = [];
+
+  if (currentUser === 'siswa') {
+    behavior = 100;
+    attendance = calcAttendanceRate(currentUsername);
+    grades = DATA_GRADES.filter(g => g.username === currentUsername);
+    
+    const tugasNilai = [];
+    DATA_TASKS.filter(t => t.kelas === u.kelas).forEach(t => {
+      const sub = DATA_SUBMISSIONS[currentUsername]?.[t.id];
+      if (sub?.nilai !== null && sub?.nilai !== undefined) {
+        tugasNilai.push({ mapel: `📝 ${t.judul}`, nilai: sub.nilai, feedback: sub.feedback });
+      }
+    });
+    grades = [...tugasNilai, ...grades];
+  } else if (currentUser === 'guru') {
+    grades = [{ mapel:'Total Tugas Dibuat', nilai: DATA_TASKS.filter(t=>t.guru===currentUsername).length }];
+  } else if (currentUser === 'admin') {
+    grades = [
+      { mapel:'Total Pengguna', nilai: Object.keys(USERS).length + ' Akun' },
+      { mapel:'Total Tugas', nilai: DATA_TASKS.length },
+      { mapel:'Status Server', nilai:'Online' }
+    ];
+  } else if (currentUser === 'ortu') {
+    const anakRel = getAnakFromOrtu(currentUsername);
+    if (anakRel) {
+      attendance = calcAttendanceRate(anakRel.username);
+      grades = DATA_GRADES.filter(g => g.username === anakRel.username);
+      
+      const anakKelas = anakRel.data.kelas;
+      const tugasNilai = [];
+      DATA_TASKS.filter(t => t.kelas === anakKelas).forEach(t => {
+        const sub = DATA_SUBMISSIONS[anakRel.username]?.[t.id];
+        if (sub?.nilai !== null && sub?.nilai !== undefined) {
+          tugasNilai.push({ mapel: `📝 ${t.judul}`, nilai: sub.nilai, feedback: sub.feedback });
+        }
+      });
+      grades = [...tugasNilai, ...grades];
+    }
+  }
+
+  document.getElementById('behaviorScore').textContent = behavior;
+  document.getElementById('attendanceRate').textContent = attendance;
+
+  if (!grades.length) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-chart-simple"></i><p>Belum ada data nilai.</p></div>`;
+    return;
+  }
+
+  const header = currentUser === 'admin' ? 'Kategori' : (currentUser === 'guru' ? 'Evaluasi' : 'Mata Pelajaran / Tugas');
+  const showFeedback = currentUser === 'siswa' || currentUser === 'ortu';
+
+  container.innerHTML = `<table>
+    <tr>
+      <th>${header}</th>
+      <th style="width:100px; text-align:center;">${currentUser==='admin'?'Status':'Nilai'}</th>
+      ${showFeedback ? '<th style="width:30%;">Feedback Guru</th>' : ''}
+    </tr>
+    ${grades.map(g => `<tr>
+      <td>${g.mapel}</td>
+      <td style="text-align:center;"><strong style="color:${typeof g.nilai==='number'?(g.nilai>=75?'var(--success)':g.nilai>=60?'var(--warning)':'var(--danger)'):'var(--primary)'};">${g.nilai}</strong></td>
+      ${showFeedback ? `<td style="font-size:0.85rem; color:var(--text-muted);"><em>${g.feedback||'-'}</em></td>` : ''}
+    </tr>`).join('')}
+  </table>`;
+}
+
+/* ---------- ABSEN ---------- */
+function renderAttendance() {
+  const container = document.getElementById('attendanceTable');
+  let data = DATA_ATTENDANCE;
+
+  if (currentUser === 'siswa') {
+    data = data.filter(a => a.username === currentUsername);
+  } else if (currentUser === 'ortu') {
+    const anakRel = getAnakFromOrtu(currentUsername);
+    if (anakRel) data = data.filter(a => a.username === anakRel.username);
+    else data = [];
+  }
+
+  if (!data.length) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-list"></i><p>Belum ada data absensi.</p></div>`;
+    return;
+  }
+
+  const badgeMap = { Hadir:'badge-success', Izin:'badge-info', Sakit:'badge-warning', Bolos:'badge-danger' };
+  data = data.slice().sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+
+  let filterHtml = '';
+  if (currentUser === 'guru' || currentUser === 'admin') {
+    const uniqueSiswa = [...new Set(data.map(a => a.username))];
+    filterHtml = `
+      <div style="margin-bottom:1rem; display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+        <label style="font-size:0.9rem; font-weight:600;">Filter Siswa:</label>
+        <select id="filterAbsenSiswa" onchange="filterAbsenTable()" style="width:auto; margin:0; padding:0.4rem 0.8rem;">
+          <option value="">-- Semua Siswa --</option>
+          ${uniqueSiswa.map(u => {
+            const s = USERS[u];
+            return `<option value="${u}">${s?s.fullName||s.name:u}</option>`;
+          }).join('')}
+        </select>
+        <select id="filterAbsenStatus" onchange="filterAbsenTable()" style="width:auto; margin:0; padding:0.4rem 0.8rem;">
+          <option value="">-- Semua Status --</option>
+          <option value="Hadir">Hadir</option>
+          <option value="Izin">Izin</option>
+          <option value="Sakit">Sakit</option>
+          <option value="Bolos">Bolos</option>
+        </select>
+      </div>
+    `;
+  }
+
+  let statHtml = '';
+  if (currentUser === 'siswa' || currentUser === 'ortu') {
+    const total = data.length;
+    const hadir = data.filter(a => a.status === 'Hadir').length;
+    const izin = data.filter(a => a.status === 'Izin').length;
+    const sakit = data.filter(a => a.status === 'Sakit').length;
+    const bolos = data.filter(a => a.status === 'Bolos').length;
+    statHtml = `
+      <div class="attendance-stat-grid">
+        <div style="background:#d4edda;"><small>Hadir</small><strong style="color:#155724;">${hadir}</strong></div>
+        <div style="background:#d1ecf1;"><small>Izin</small><strong style="color:#0c5460;">${izin}</strong></div>
+        <div style="background:#fff3cd;"><small>Sakit</small><strong style="color:#856404;">${sakit}</strong></div>
+        <div style="background:#f8d7da;"><small>Bolos</small><strong style="color:#721c24;">${bolos}</strong></div>
+      </div>
+      <p style="margin-bottom:0.8rem; font-size:0.9rem; color:var(--text-muted);">
+        Total ${total} hari tercatat · Kehadiran: <strong>${total?(hadir/total*100).toFixed(0):0}%</strong>
+      </p>
+    `;
+  }
+
+  const showNameCol = currentUser === 'admin' || currentUser === 'guru';
+
+  container.innerHTML = `
+    ${filterHtml}
+    ${statHtml}
+    <table id="absenTable">
+      <tr>
+        <th>Tanggal</th>
+        ${showNameCol?'<th>Nama Siswa</th>':''}
+        <th>Kelas</th>
+        <th>Status</th>
+      </tr>
+      ${data.map(a => {
+        const user = USERS[a.username];
+        return `<tr data-username="${a.username}" data-status="${a.status}">
+          <td>${formatDate(a.tanggal)}</td>
+          ${showNameCol?`<td>${user?user.fullName||user.name:a.username}</td>`:''}
+          <td>${user?.kelas||'-'}</td>
+          <td><span class="badge ${badgeMap[a.status]||'badge-info'}">${a.status}</span></td>
+        </tr>`;
+      }).join('')}
+    </table>
+  `;
+}
+
+function filterAbsenTable() {
+  const siswa = document.getElementById('filterAbsenSiswa')?.value || '';
+  const status = document.getElementById('filterAbsenStatus')?.value || '';
+  const rows = document.querySelectorAll('#absenTable tr[data-username]');
+  rows.forEach(row => {
+    const matchSiswa = !siswa || row.dataset.username === siswa;
+    const matchStatus = !status || row.dataset.status === status;
+    row.style.display = (matchSiswa && matchStatus) ? '' : 'none';
+  });
+}
+
+/* ---------- ABSEN PER-SISWA ---------- */
+function renderAbsenSiswaList() {
+  const kelas = document.getElementById('absenClass').value;
+  const container = document.getElementById('absenSiswaList');
+  const tanggal = document.getElementById('absenTanggal')?.value || today();
+
+  if (!kelas) {
+    container.innerHTML = `<div class="empty-state" style="padding:1rem;"><p>Pilih kelas untuk menampilkan daftar siswa.</p></div>`;
+    return;
+  }
+
+  const siswas = Object.entries(USERS).filter(([k,v]) => v.role === 'siswa' && v.kelas === kelas);
+
+  if (!siswas.length) {
+    container.innerHTML = `<div class="empty-state" style="padding:1rem;"><p>Tidak ada siswa di kelas ${kelas}.</p></div>`;
+    return;
+  }
+
+  const existing = {};
+  DATA_ATTENDANCE.filter(a => a.tanggal === tanggal).forEach(a => {
+    existing[a.username] = a.status;
+  });
+
+  container.innerHTML = `
+    <div style="background:white; border-radius:12px; padding:1rem; border:1px solid #dce8f2;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; padding:0.5rem; background:#f4f9ff; border-radius:8px; font-weight:600; font-size:0.85rem;">
+        <span>Nama Siswa (${siswas.length})</span>
+        <span>Status Kehadiran</span>
+      </div>
+      ${siswas.map(([username, s]) => `
+        <div class="absen-row">
+          <div style="flex:1;">
+            <strong style="font-size:0.95rem;">${s.fullName || s.name}</strong>
+            <small style="display:block; color:var(--text-muted);">NIS: ${s.nis||'-'}</small>
+          </div>
+          <select class="absen-status" data-username="${username}">
+            <option value="Hadir" ${existing[username]==='Hadir'||!existing[username]?'selected':''}>✅ Hadir</option>
+            <option value="Izin" ${existing[username]==='Izin'?'selected':''}>📧 Izin</option>
+            <option value="Sakit" ${existing[username]==='Sakit'?'selected':''}>🤒 Sakit</option>
+            <option value="Bolos" ${existing[username]==='Bolos'?'selected':''}>❌ Bolos</option>
+          </select>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function tandaiSemua(status) {
+  const selects = document.querySelectorAll('.absen-status');
+  if (!selects.length) { toast('Pilih kelas dulu!', 'warning'); return; }
+  selects.forEach(sel => sel.value = status);
+  toast(`Semua siswa ditandai "${status}"`, 'info');
+}
+
+function saveAttendanceBatch() {
+  const kelas = document.getElementById('absenClass').value;
+  const tanggal = document.getElementById('absenTanggal').value || today();
+
+  if (!kelas) { toast('Pilih kelas terlebih dahulu!', 'error'); return; }
+
+  const selects = document.querySelectorAll('.absen-status');
+  if (!selects.length) { toast('Tidak ada siswa untuk diabsen!', 'error'); return; }
+
+  let count = 0;
+  selects.forEach(sel => {
+    const username = sel.dataset.username;
+    const status = sel.value;
+
+    DATA_ATTENDANCE = DATA_ATTENDANCE.filter(a =>
+      !(a.username === username && a.tanggal === tanggal)
+    );
+
+    DATA_ATTENDANCE.push({
+      username,
+      tanggal,
+      status,
+      recordedBy: currentUsername,
+      recordedAt: new Date().toISOString()
+    });
+    count++;
+  });
+
+  saveState();
+  toast(`✅ Presensi ${count} siswa kelas ${kelas} tanggal ${formatDate(tanggal)} tersimpan!`, 'success');
+  renderAll();
+}
+
+/* ---------- INFO ---------- */
+function renderInfo() {
+  const container = document.getElementById('infoList');
+  if (!DATA_INFO.length) {
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-bullhorn"></i><p>Belum ada pengumuman.</p></div>`;
+    return;
+  }
+  container.innerHTML = DATA_INFO.map(i => `
+    <div class="info-item">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <strong><i class="fas fa-bullhorn"></i> ${i.judul}</strong>
+        <small style="color:var(--text-muted)">${formatDate(i.tanggal)}</small>
+      </div>
+      <p style="margin-top:6px;">${i.isi}</p>
+      ${currentUser==='admin'?`<button class="btn-danger btn-sm" style="margin-top:8px;" onclick="deleteInfo('${i.id}')"><i class="fas fa-trash"></i> Hapus</button>`:''}
+    </div>
+  `).join('');
+}
+
+function addInfo() {
+  const title = document.getElementById('infoTitle').value.trim();
+  const desc = document.getElementById('infoDesc').value.trim();
+  if (!title || !desc) { toast('Judul dan isi pengumuman wajib diisi!', 'error'); return; }
+  DATA_INFO.unshift({ id:'I'+Date.now(), tanggal: today(), judul:title, isi:desc });
+  saveState();
+  document.getElementById('infoTitle').value = '';
+  document.getElementById('infoDesc').value = '';
+  toast('✅ Pengumuman ditambahkan!', 'success');
+  renderAll();
+}
+
+function deleteInfo(id) {
+  if (!confirm('Hapus pengumuman ini?')) return;
+  DATA_INFO = DATA_INFO.filter(i => i.id !== id);
+  saveState();
+  toast('Pengumuman dihapus.', 'info');
+  renderAll();
+}
+
+/* ---------- ADMIN PANEL ---------- */
+function renderAdminPanel() {
+  if (currentUser !== 'admin') return;
+
+  populateSiswaDropdown();
+
+  const userList = document.getElementById('userList');
+  let html = `<table>
+    <tr><th>Username</th><th>Nama Lengkap</th><th>Role</th><th>Detail</th><th>Aksi</th></tr>`;
+
+  for (const [username, data] of Object.entries(USERS)) {
+    let detail = '-';
+    if (data.role === 'siswa') detail = `NIS: ${data.nis||'-'} | Kelas: ${data.kelas||'-'} | Ekskul: ${data.ekskul||'-'}`;
+    else if (data.role === 'guru') detail = `NIP: ${data.nip||'-'} | Mapel: ${data.mapel||'-'}`;
+    else if (data.role === 'ortu') {
+      const anakNama = data.anakUsername && USERS[data.anakUsername] 
+        ? (USERS[data.anakUsername].fullName || USERS[data.anakUsername].name)
+        : (data.anak || '-');
+      detail = `Anak: ${anakNama} | Hubungan: ${data.hubungan||'-'}`;
+    }
+    else if (data.role === 'admin') {
+      detail = data.isCoAdmin 
+        ? `🛡️ Co-Admin${data.jabatan?' · '+data.jabatan:''}` 
+        : '👑 Super Admin';
+    }
+
+    html += `<tr>
+      <td><strong>${username}</strong></td>
+      <td>${data.fullName || data.name}</td>
+      <td><span class="badge badge-info">${data.role.toUpperCase()}</span></td>
+      <td style="font-size:0.85rem;">${detail}</td>
+      <td>
+        <button class="btn-primary btn-sm" onclick="editUser('${username}')"><i class="fas fa-edit"></i></button>
+        ${username !== 'admin' ? `<button class="btn-danger btn-sm" onclick="deleteUser('${username}')"><i class="fas fa-trash"></i></button>` : ''}
+      </td>
+    </tr>`;
+  }
+  html += `</table>`;
+  userList.innerHTML = html;
+
+  const totalUsers = Object.keys(USERS).length;
+  const totalSiswa = Object.values(USERS).filter(u=>u.role==='siswa').length;
+  const totalGuru = Object.values(USERS).filter(u=>u.role==='guru').length;
+  const totalOrtu = Object.values(USERS).filter(u=>u.role==='ortu').length;
+  const totalAdmin = Object.values(USERS).filter(u=>u.role==='admin').length;
+
+  document.getElementById('websiteStats').innerHTML = `
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem;">
+      <div style="background:white; padding:1rem; border-radius:12px; text-align:center;">
+        <strong>Total Pengguna</strong><div style="font-size:2rem; color:var(--primary);">${totalUsers}</div>
+      </div>
+      <div style="background:white; padding:1rem; border-radius:12px; text-align:center;">
+        <strong>Siswa</strong><div style="font-size:2rem; color:var(--primary);">${totalSiswa}</div>
+      </div>
+      <div style="background:white; padding:1rem; border-radius:12px; text-align:center;">
+        <strong>Guru</strong><div style="font-size:2rem; color:var(--primary);">${totalGuru}</div>
+      </div>
+      <div style="background:white; padding:1rem; border-radius:12px; text-align:center;">
+        <strong>Orang Tua</strong><div style="font-size:2rem; color:var(--primary);">${totalOrtu}</div>
+      </div>
+      <div style="background:white; padding:1rem; border-radius:12px; text-align:center;">
+        <strong>Admin</strong><div style="font-size:2rem; color:var(--primary);">${totalAdmin}</div>
+      </div>
+    </div>
+  `;
+}
+
+function populateSiswaDropdown() {
+  const select = document.getElementById('newAnakUsername');
+  if (!select) return;
+  const currentVal = select.value;
+  const siswas = Object.entries(USERS).filter(([k,v]) => v.role === 'siswa');
+  select.innerHTML = '<option value="">-- Pilih Siswa --</option>' +
+    siswas.map(([k,v]) => `<option value="${k}">${v.fullName||v.name} (${v.kelas||'-'})</option>`).join('');
+  if (currentVal) select.value = currentVal;
+}
+
+/* ---------- ADMIN: ADD USER ---------- */
+function addUserFull() {
+  if (currentUser !== 'admin') return;
+
+  const username = document.getElementById('newUsername').value.trim().toLowerCase();
+  const password = document.getElementById('newPassword').value.trim();
+  const fullName = document.getElementById('newFullName').value.trim();
+  const role = document.getElementById('newRole').value;
+
+  if (!username || !password || !fullName) {
+    toast('Username, password, dan nama lengkap wajib diisi!', 'error');
+    return;
+  }
+  if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+    toast('Username hanya huruf kecil/angka/underscore (3-20 karakter)', 'error');
+    return;
+  }
+  if (password.length < 5) {
+    toast('Password minimal 5 karakter!', 'error');
+    return;
+  }
+  if (USERS[username]) {
+    toast('Username sudah terdaftar!', 'error');
+    return;
+  }
+
+  const newUser = { password, role, name: fullName, fullName };
+
+  if (role === 'siswa') {
+    const nis = document.getElementById('newNIS').value.trim();
+    if (!nis) { toast('NIS wajib diisi untuk siswa!', 'error'); return; }
+    newUser.nis = nis;
+    newUser.namaPanggilan = document.getElementById('newNamaPanggilan').value.trim() || fullName;
+    newUser.kelas = document.getElementById('newKelas').value;
+    newUser.tempatLahir = document.getElementById('newTempatLahir').value.trim() || '-';
+    newUser.tanggalLahir = document.getElementById('newTanggalLahir').value || '';
+    newUser.jenisKelamin = document.getElementById('newJenisKelamin').value;
+    newUser.alamat = document.getElementById('newAlamat').value.trim() || '-';
+    newUser.noTelp = document.getElementById('newNoTelp').value.trim() || '-';
+    newUser.ekskul = document.getElementById('newEkskul').value.trim() || '-';
+    newUser.namaOrtu = document.getElementById('newNamaOrtu').value.trim() || '-';
+    newUser.noTelpOrtu = document.getElementById('newNoTelpOrtu').value.trim() || '-';
+  } else if (role === 'guru') {
+    const nip = document.getElementById('newNIP').value.trim();
+    const mapel = document.getElementById('newMapel').value.trim();
+    if (!nip || !mapel) { toast('NIP dan Mapel wajib diisi!', 'error'); return; }
+    newUser.nip = nip;
+    newUser.mapel = mapel;
+  } else if (role === 'ortu') {
+    const anakUsername = document.getElementById('newAnakUsername').value;
+    const hubungan = document.getElementById('newHubungan').value.trim();
+    if (!anakUsername || !USERS[anakUsername]) {
+      toast('Pilih siswa yang valid sebagai anak!', 'error');
+      return;
+    }
+    if (!hubungan) { toast('Hubungan wajib diisi!', 'error'); return; }
+    newUser.anakUsername = anakUsername;
+    newUser.anak = USERS[anakUsername].fullName || USERS[anakUsername].name;
+    newUser.hubungan = hubungan;
+  } else if (role === 'admin') {
+    newUser.isCoAdmin = true;
+    newUser.jabatan = document.getElementById('newJabatan').value.trim() || 'Co-Admin';
+    newUser.noTelp = document.getElementById('newNoTelpAdmin').value.trim() || '-';
+  }
+
+  USERS[username] = newUser;
+  saveState();
+  toast(`✅ Pengguna ${fullName} ditambahkan sebagai ${role.toUpperCase()}!`, 'success');
+  clearForm();
+  renderAll();
+}
+
+function editUser(username) {
+  const u = USERS[username];
+  if (!u) return;
+  let fieldsHtml = `
+    <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">Nama Lengkap</label>
+    <input type="text" id="editFullName" value="${u.fullName||u.name||''}" placeholder="Nama Lengkap">
+  `;
+  if (u.role === 'siswa') {
+    fieldsHtml += `
+      <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">Kelas</label>
+      <select id="editKelas">
+        ${['X TKJ','X DKV','X AKL','XI TKJ','XI DKV','XI AKL','XII TKJ','XII DKV','XII AKL'].map(k => `<option value="${k}" ${k===u.kelas?'selected':''}>${k}</option>`).join('')}
+      </select>
+      <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">Ekskul</label>
+      <input type="text" id="editEkskul" value="${u.ekskul||''}" placeholder="Ekskul">
+    `;
+  } else if (u.role === 'guru') {
+    fieldsHtml += `
+      <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">Mata Pelajaran</label>
+      <input type="text" id="editMapel" value="${u.mapel||''}" placeholder="Mata Pelajaran">
+    `;
+  } else if (u.role === 'ortu') {
+    const siswas = Object.entries(USERS).filter(([k,v]) => v.role === 'siswa');
+    const options = siswas.map(([k,v]) =>
+      `<option value="${k}" ${k === u.anakUsername ? 'selected' : ''}>${v.fullName||v.name} (${v.kelas||'-'})</option>`
+    ).join('');
+    fieldsHtml += `
+      <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">Anak (Siswa)</label>
+      <select id="editAnakUsername">
+        <option value="">-- Pilih Siswa --</option>
+        ${options}
+      </select>
+      <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">Hubungan</label>
+      <input type="text" id="editHubungan" value="${u.hubungan||''}" placeholder="Ibu/Ayah/Wali">
+    `;
+  } else if (u.role === 'admin') {
+    fieldsHtml += `
+      <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:4px;">Jabatan</label>
+      <input type="text" id="editJabatan" value="${u.jabatan||''}" placeholder="Jabatan">
+    `;
+  }
+
+  showModal(`Edit Pengguna: ${username}`, fieldsHtml, () => {
+    u.fullName = document.getElementById('editFullName').value.trim() || u.fullName;
+    u.name = u.fullName;
+    if (u.role === 'siswa') {
+      u.kelas = document.getElementById('editKelas').value || u.kelas;
+      u.ekskul = document.getElementById('editEkskul').value.trim() || u.ekskul;
+    } else if (u.role === 'guru') {
+      u.mapel = document.getElementById('editMapel').value.trim() || u.mapel;
+    } else if (u.role === 'ortu') {
+      const newAnak = document.getElementById('editAnakUsername').value;
+      if (newAnak && USERS[newAnak]) {
+        u.anakUsername = newAnak;
+        u.anak = USERS[newAnak].fullName || USERS[newAnak].name;
+      }
+      u.hubungan = document.getElementById('editHubungan').value.trim() || u.hubungan;
+    } else if (u.role === 'admin') {
+      u.jabatan = document.getElementById('editJabatan').value.trim() || u.jabatan;
+    }
+    saveState();
+    toast('✅ Data pengguna diperbarui!', 'success');
+    renderAll();
+  }, 'Simpan Perubahan');
+}
+
+function clearForm() {
+  ['newUsername','newPassword','newFullName','newNIS','newNamaPanggilan','newTempatLahir','newTanggalLahir','newAlamat','newNoTelp','newEkskul','newNamaOrtu','newNoTelpOrtu','newNIP','newMapel','newHubungan','newJabatan','newNoTelpAdmin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const anakSel = document.getElementById('newAnakUsername');
+  if (anakSel) anakSel.value = '';
+}
+
+function deleteUser(username) {
+  if (username === 'admin') { 
+    toast('Tidak dapat menghapus admin utama!', 'error'); 
+    return; 
+  }
+  
+  const target = USERS[username];
+  if (target && target.role === 'admin') {
+    if (!confirm(`⚠️ "${username}" adalah ADMIN. Yakin ingin menghapus rekan admin ini?`)) return;
+  } else {
+    if (!confirm(`Hapus pengguna "${username}"?`)) return;
+  }
+  
+  delete USERS[username];
+  DATA_SUBMISSIONS[username] = {};
+  DATA_ATTENDANCE = DATA_ATTENDANCE.filter(a => a.username !== username);
+  DATA_GRADES = DATA_GRADES.filter(g => g.username !== username);
+  saveState();
+  toast(`Pengguna ${username} dihapus.`, 'info');
+  renderAll();
+}
+
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
+document.getElementById('newRole').addEventListener('change', function() {
+  const role = this.value;
+  ['siswaFields','siswaFields2','siswaFields3','siswaFields4'].forEach(id => {
+    document.getElementById(id).style.display = role === 'siswa' ? 'grid' : 'none';
+  });
+  document.getElementById('guruFields').style.display = role === 'guru' ? 'grid' : 'none';
+  document.getElementById('ortuFields').style.display = role === 'ortu' ? 'grid' : 'none';
+  document.getElementById('adminFields').style.display = role === 'admin' ? 'grid' : 'none';
+  if (role === 'ortu') populateSiswaDropdown();
+  if (role === 'admin') {
+    toast('ℹ️ Admin baru akan punya akses penuh ke panel admin.', 'info');
+  }
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const tabId = this.dataset.tab;
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    this.classList.add('active');
+    if (tabId === 'admin' && currentUser === 'admin') renderAdminPanel();
+    if (tabId === 'absen' && (currentUser === 'guru' || currentUser === 'admin')) {
+      renderAbsenSiswaList();
+    }
+    if (tabId === 'jadwal') renderSchedule();
+    if (tabId === 'penilaian' && (currentUser === 'guru' || currentUser === 'admin')) {
+      renderSubmissionList();
+    }
+  });
+});
+
+document.getElementById('absenTanggal')?.addEventListener('change', renderAbsenSiswaList);
+
+document.getElementById('passwordInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+/* ============================================================
+   SHORTCUT RAHASIA: Ctrl + Shift + A
+   ============================================================ */
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a' || e.code === 'KeyA')) {
+    e.preventDefault();
+    
+    if (currentUser) {
+      toast('Anda sudah login. Logout dulu untuk ganti akun.', 'warning');
+      return;
+    }
+    
+    const panel = document.getElementById('adminLoginPanel');
+    const roleSelect = document.getElementById('roleSelect');
+    if (!panel || !roleSelect) return;
+    
+    if (panel.style.display === 'none' || !panel.style.display) {
+      panel.style.display = 'block';
+      roleSelect.style.display = 'none';
+      document.getElementById('usernameInput').value = '';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('usernameInput').focus();
+      toast('🔓 Mode Admin terbuka. Masukkan credential admin.', 'info');
+    } else {
+      panel.style.display = 'none';
+      roleSelect.style.display = '';
+      document.getElementById('usernameInput').value = '';
+      document.getElementById('passwordInput').value = '';
+      toast('🔒 Mode Admin ditutup.', 'info');
+    }
+  }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.getElementById('appContent').classList.remove('show');
+document.getElementById('loginScreen').classList.remove('hide');
+
+const absenTglInit = document.getElementById('absenTanggal');
+if (absenTglInit) absenTglInit.value = today();
+
+const jadwalSelectInit = document.getElementById('jadwalKelasSelect');
+if (jadwalSelectInit) jadwalSelectInit.value = 'X TKJ';
+</script>
+</body>
+</html>
