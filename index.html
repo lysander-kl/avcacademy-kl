@@ -247,6 +247,49 @@
   .dot-jurusan { background:var(--primary); }
   .dot-umum { background:#aaa; }
 
+  /* ===== STYLE BIODATA ===== */
+  .biodata-header {
+    display:flex; align-items:center; gap:1.5rem; margin-bottom:2rem;
+    padding:1.5rem; background:linear-gradient(145deg,#0b2a41,#123b5a);
+    border-radius:24px; color:white; flex-wrap:wrap;
+  }
+  .biodata-avatar {
+    width:100px; height:100px; border-radius:50%; background:var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    font-size:2.5rem; color:var(--primary); font-weight:700;
+    border:4px solid rgba(255,255,255,0.3); flex-shrink:0;
+  }
+  .biodata-header-info h2 { font-size:1.5rem; margin-bottom:4px; }
+  .biodata-header-info p { font-size:0.9rem; opacity:0.85; }
+  .biodata-header-info .role-tag {
+    display:inline-block; background:var(--accent); color:var(--primary);
+    padding:0.2rem 0.9rem; border-radius:30px; font-size:0.75rem;
+    font-weight:700; text-transform:uppercase; margin-top:6px;
+  }
+  .biodata-section {
+    margin-bottom:1.5rem;
+  }
+  .biodata-section h4 {
+    color:var(--primary); margin-bottom:1rem; padding-bottom:0.5rem;
+    border-bottom:2px solid var(--border); display:flex; align-items:center; gap:8px;
+    font-size:1rem;
+  }
+  .biodata-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:0.8rem;
+  }
+  .biodata-item {
+    display:flex; padding:0.7rem 1rem; background:#f8fbff;
+    border-radius:12px; border-left:4px solid var(--primary);
+  }
+  .biodata-item .label {
+    font-size:0.8rem; color:var(--text-muted); font-weight:600;
+    min-width:130px; text-transform:uppercase;
+  }
+  .biodata-item .value {
+    font-size:0.9rem; color:var(--text); font-weight:500; flex:1;
+  }
+  .biodata-item.full { grid-column:1 / -1; }
+
   @media (max-width:700px) {
     .main-header { flex-direction:column; align-items:stretch; gap:0.8rem; }
     .user-area { justify-content:space-between; padding:0.4rem 1rem; }
@@ -254,12 +297,15 @@
     .tab-btn { font-size:0.8rem; padding:0.4rem 0.8rem; }
     .dashboard-grid { grid-template-columns:1fr 1fr; }
     .form-row, .form-row-3 { grid-template-columns:1fr; }
+    .biodata-item { flex-direction:column; }
+    .biodata-item .label { min-width:auto; margin-bottom:2px; }
   }
   @media (max-width:480px) {
     .dashboard-grid { grid-template-columns:1fr; }
     .stat-card { padding:1rem; }
     #toastContainer { left:10px; right:10px; }
     .toast { min-width:auto; }
+    .biodata-header { flex-direction:column; text-align:center; }
   }
 </style>
 </head>
@@ -325,7 +371,7 @@
       <button class="tab-btn" data-tab="jadwal"><i class="fas fa-calendar-alt"></i> Jadwal</button>
       <button class="tab-btn" data-tab="tugas"><i class="fas fa-tasks"></i> Tugas</button>
       <button class="tab-btn teacher-tab" data-tab="penilaian" style="display:none;"><i class="fas fa-clipboard-check"></i> Penilaian</button>
-      <button class="tab-btn" data-tab="nilai"><i class="fas fa-chart-line"></i> Nilai & Profil</button>
+      <button class="tab-btn" data-tab="nilai"><i class="fas fa-id-card"></i> Profil</button>
       <button class="tab-btn" data-tab="absen"><i class="fas fa-clipboard-check"></i> Absen</button>
       <button class="tab-btn" data-tab="info"><i class="fas fa-bell"></i> Info</button>
       <button class="tab-btn admin-tab" data-tab="admin" style="display:none;"><i class="fas fa-user-shield"></i> Admin</button>
@@ -413,16 +459,9 @@
       </div>
     </div>
 
+    <!-- ===== TAB PROFIL (BIODATA) ===== -->
     <div id="tab-nilai" class="tab-content">
-      <div class="dashboard-grid">
-        <div class="stat-card"><i class="fas fa-id-card"></i><div class="stat-detail"><span class="stat-label">Profil</span><span class="stat-value" id="profileName">-</span></div></div>
-        <div class="stat-card"><i class="fas fa-star"></i><div class="stat-detail"><span class="stat-label">Skor Kelakuan</span><span class="stat-value" id="behaviorScore">-</span></div></div>
-        <div class="stat-card"><i class="fas fa-user-check"></i><div class="stat-detail"><span class="stat-label">Kehadiran</span><span class="stat-value" id="attendanceRate">-</span></div></div>
-      </div>
-      <div class="table-container">
-        <h3><i class="fas fa-list-check"></i> Rapor Nilai</h3>
-        <div id="gradeTable"></div>
-      </div>
+      <div id="profileContent"></div>
     </div>
 
     <div id="tab-absen" class="tab-content">
@@ -955,7 +994,7 @@ function renderAll() {
   renderDashboard();
   renderSchedule();
   renderTasks();
-  renderGrades();
+  renderProfile();
   renderAttendance();
   renderInfo();
   if (currentUser === 'guru' || currentUser === 'admin') {
@@ -1514,77 +1553,143 @@ function deleteTask(id) {
   renderAll();
 }
 
-/* ---------- NILAI & PROFIL ---------- */
-function renderGrades() {
-  const container = document.getElementById('gradeTable');
+/* ============================================================
+   PROFIL (BIODATA LENGKAP) — menggantikan renderGrades()
+   ============================================================ */
+function renderProfile() {
+  const container = document.getElementById('profileContent');
   const u = USERS[currentUsername];
 
-  document.getElementById('profileName').textContent = u.fullName || u.name || '-';
+  let profileUser = u;
+  let isViewingChild = false;
 
-  let behavior = '-', attendance = '-', grades = [];
-
-  if (currentUser === 'siswa') {
-    behavior = 100;
-    attendance = calcAttendanceRate(currentUsername);
-    grades = DATA_GRADES.filter(g => g.username === currentUsername);
-    
-    const tugasNilai = [];
-    DATA_TASKS.filter(t => t.kelas === u.kelas).forEach(t => {
-      const sub = DATA_SUBMISSIONS[currentUsername]?.[t.id];
-      if (sub?.nilai !== null && sub?.nilai !== undefined) {
-        tugasNilai.push({ mapel: `📝 ${t.judul}`, nilai: sub.nilai, feedback: sub.feedback });
-      }
-    });
-    grades = [...tugasNilai, ...grades];
-  } else if (currentUser === 'guru') {
-    grades = [{ mapel:'Total Tugas Dibuat', nilai: DATA_TASKS.filter(t=>t.guru===currentUsername).length }];
-  } else if (currentUser === 'admin') {
-    grades = [
-      { mapel:'Total Pengguna', nilai: Object.keys(USERS).length + ' Akun' },
-      { mapel:'Total Tugas', nilai: DATA_TASKS.length },
-      { mapel:'Status Server', nilai:'Online' }
-    ];
-  } else if (currentUser === 'ortu') {
+  // Untuk ortu, tampilkan biodata anak
+  if (currentUser === 'ortu') {
     const anakRel = getAnakFromOrtu(currentUsername);
     if (anakRel) {
-      attendance = calcAttendanceRate(anakRel.username);
-      grades = DATA_GRADES.filter(g => g.username === anakRel.username);
-      
-      const anakKelas = anakRel.data.kelas;
-      const tugasNilai = [];
-      DATA_TASKS.filter(t => t.kelas === anakKelas).forEach(t => {
-        const sub = DATA_SUBMISSIONS[anakRel.username]?.[t.id];
-        if (sub?.nilai !== null && sub?.nilai !== undefined) {
-          tugasNilai.push({ mapel: `📝 ${t.judul}`, nilai: sub.nilai, feedback: sub.feedback });
-        }
-      });
-      grades = [...tugasNilai, ...grades];
+      profileUser = anakRel.data;
+      isViewingChild = true;
+    } else {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><p>Data anak belum terhubung. Hubungi admin.</p></div>`;
+      return;
     }
   }
 
-  document.getElementById('behaviorScore').textContent = behavior;
-  document.getElementById('attendanceRate').textContent = attendance;
+  const nama = profileUser.fullName || profileUser.name || currentUsername;
+  const inisial = nama.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
 
-  if (!grades.length) {
-    container.innerHTML = `<div class="empty-state"><i class="fas fa-chart-simple"></i><p>Belum ada data nilai.</p></div>`;
-    return;
+  let roleLabel = '';
+  let roleIcon = 'fa-user';
+  if (profileUser.role === 'siswa') { roleLabel = 'Siswa'; roleIcon = 'fa-user-graduate'; }
+  else if (profileUser.role === 'guru') { roleLabel = 'Guru'; roleIcon = 'fa-chalkboard-teacher'; }
+  else if (profileUser.role === 'ortu') { roleLabel = 'Orang Tua'; roleIcon = 'fa-users'; }
+  else if (profileUser.role === 'admin') { roleLabel = 'Administrator'; roleIcon = 'fa-user-shield'; }
+
+  let sectionsHtml = '';
+
+  if (profileUser.role === 'siswa') {
+    sectionsHtml = `
+      <div class="biodata-section">
+        <h4><i class="fas fa-id-card"></i> Data Pribadi</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Nama Lengkap</span><span class="value">${nama}</span></div>
+          <div class="biodata-item"><span class="label">Nama Panggilan</span><span class="value">${profileUser.namaPanggilan || '-'}</span></div>
+          <div class="biodata-item"><span class="label">NIS</span><span class="value">${profileUser.nis || '-'}</span></div>
+          <div class="biodata-item"><span class="label">Jenis Kelamin</span><span class="value">${profileUser.jenisKelamin || '-'}</span></div>
+          <div class="biodata-item"><span class="label">Tempat Lahir</span><span class="value">${profileUser.tempatLahir || '-'}</span></div>
+          <div class="biodata-item"><span class="label">Tanggal Lahir</span><span class="value">${profileUser.tanggalLahir ? formatDate(profileUser.tanggalLahir) : '-'}</span></div>
+          <div class="biodata-item full"><span class="label">Alamat</span><span class="value">${profileUser.alamat || '-'}</span></div>
+          <div class="biodata-item"><span class="label">No. Telepon</span><span class="value">${profileUser.noTelp || '-'}</span></div>
+        </div>
+      </div>
+      <div class="biodata-section">
+        <h4><i class="fas fa-school"></i> Data Akademik</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Kelas</span><span class="value">${profileUser.kelas || '-'}</span></div>
+          <div class="biodata-item"><span class="label">Ekskul</span><span class="value">${profileUser.ekskul || '-'}</span></div>
+          <div class="biodata-item"><span class="label">Kehadiran</span><span class="value">${calcAttendanceRate(currentUser === 'ortu' ? Object.keys(USERS).find(k => USERS[k] === profileUser) : currentUsername)}</span></div>
+        </div>
+      </div>
+      <div class="biodata-section">
+        <h4><i class="fas fa-people-roof"></i> Data Orang Tua / Wali</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Nama Orang Tua</span><span class="value">${profileUser.namaOrtu || '-'}</span></div>
+          <div class="biodata-item"><span class="label">No. Telepon Ortu</span><span class="value">${profileUser.noTelpOrtu || '-'}</span></div>
+        </div>
+      </div>
+    `;
+  } else if (profileUser.role === 'guru') {
+    sectionsHtml = `
+      <div class="biodata-section">
+        <h4><i class="fas fa-id-card"></i> Data Pribadi</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Nama Lengkap</span><span class="value">${nama}</span></div>
+          <div class="biodata-item"><span class="label">NIP</span><span class="value">${profileUser.nip || '-'}</span></div>
+          <div class="biodata-item full"><span class="label">Mata Pelajaran</span><span class="value">${profileUser.mapel || '-'}</span></div>
+        </div>
+      </div>
+      <div class="biodata-section">
+        <h4><i class="fas fa-chalkboard"></i> Statistik Mengajar</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Tugas Dibuat</span><span class="value">${DATA_TASKS.filter(t => t.guru === currentUsername).length} tugas</span></div>
+          <div class="biodata-item"><span class="label">Total Submission</span><span class="value">${(() => { let c = 0; DATA_TASKS.filter(t => t.guru === currentUsername).forEach(t => { Object.values(DATA_SUBMISSIONS).forEach(s => { if (s[t.id]) c++; }); }); return c; })()} submission</span></div>
+        </div>
+      </div>
+    `;
+  } else if (profileUser.role === 'ortu') {
+    const anakRel = getAnakFromOrtu(currentUsername);
+    sectionsHtml = `
+      <div class="biodata-section">
+        <h4><i class="fas fa-id-card"></i> Data Pribadi</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Nama Lengkap</span><span class="value">${nama}</span></div>
+          <div class="biodata-item"><span class="label">Hubungan</span><span class="value">${profileUser.hubungan || '-'}</span></div>
+        </div>
+      </div>
+      <div class="biodata-section">
+        <h4><i class="fas fa-child"></i> Data Anak</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Nama Anak</span><span class="value">${anakRel ? (anakRel.data.fullName || anakRel.data.name) : '-'}</span></div>
+          <div class="biodata-item"><span class="label">Kelas Anak</span><span class="value">${anakRel ? (anakRel.data.kelas || '-') : '-'}</span></div>
+          <div class="biodata-item"><span class="label">NIS Anak</span><span class="value">${anakRel ? (anakRel.data.nis || '-') : '-'}</span></div>
+          <div class="biodata-item"><span class="label">Kehadiran Anak</span><span class="value">${anakRel ? calcAttendanceRate(anakRel.username) : '-'}</span></div>
+        </div>
+      </div>
+    `;
+  } else if (profileUser.role === 'admin') {
+    sectionsHtml = `
+      <div class="biodata-section">
+        <h4><i class="fas fa-id-card"></i> Data Admin</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Nama Lengkap</span><span class="value">${nama}</span></div>
+          <div class="biodata-item"><span class="label">Username</span><span class="value">${currentUsername}</span></div>
+          <div class="biodata-item"><span class="label">Jabatan</span><span class="value">${profileUser.jabatan || 'Super Admin'}</span></div>
+          <div class="biodata-item"><span class="label">No. Telepon</span><span class="value">${profileUser.noTelp || '-'}</span></div>
+        </div>
+      </div>
+      <div class="biodata-section">
+        <h4><i class="fas fa-database"></i> Statistik Sistem</h4>
+        <div class="biodata-grid">
+          <div class="biodata-item"><span class="label">Total Pengguna</span><span class="value">${Object.keys(USERS).length} akun</span></div>
+          <div class="biodata-item"><span class="label">Total Tugas</span><span class="value">${DATA_TASKS.length} tugas</span></div>
+          <div class="biodata-item"><span class="label">Total Pengumuman</span><span class="value">${DATA_INFO.length} pengumuman</span></div>
+          <div class="biodata-item"><span class="label">Jadwal Kelas</span><span class="value">${Object.keys(DATA_JADWAL).length} kelas</span></div>
+        </div>
+      </div>
+    `;
   }
 
-  const header = currentUser === 'admin' ? 'Kategori' : (currentUser === 'guru' ? 'Evaluasi' : 'Mata Pelajaran / Tugas');
-  const showFeedback = currentUser === 'siswa' || currentUser === 'ortu';
-
-  container.innerHTML = `<table>
-    <tr>
-      <th>${header}</th>
-      <th style="width:100px; text-align:center;">${currentUser==='admin'?'Status':'Nilai'}</th>
-      ${showFeedback ? '<th style="width:30%;">Feedback Guru</th>' : ''}
-    </tr>
-    ${grades.map(g => `<tr>
-      <td>${g.mapel}</td>
-      <td style="text-align:center;"><strong style="color:${typeof g.nilai==='number'?(g.nilai>=75?'var(--success)':g.nilai>=60?'var(--warning)':'var(--danger)'):'var(--primary)'};">${g.nilai}</strong></td>
-      ${showFeedback ? `<td style="font-size:0.85rem; color:var(--text-muted);"><em>${g.feedback||'-'}</em></td>` : ''}
-    </tr>`).join('')}
-  </table>`;
+  container.innerHTML = `
+    <div class="biodata-header">
+      <div class="biodata-avatar">${inisial}</div>
+      <div class="biodata-header-info">
+        <h2>${nama}</h2>
+        <p><i class="fas ${roleIcon}"></i> ${isViewingChild ? 'Orang Tua dari ' + roleLabel : roleLabel}</p>
+        <span class="role-tag">${roleLabel}</span>
+      </div>
+    </div>
+    ${sectionsHtml}
+  `;
 }
 
 /* ---------- ABSEN ---------- */
@@ -2092,6 +2197,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (tabId === 'penilaian' && (currentUser === 'guru' || currentUser === 'admin')) {
       renderSubmissionList();
     }
+    if (tabId === 'nilai') renderProfile();
   });
 });
 
