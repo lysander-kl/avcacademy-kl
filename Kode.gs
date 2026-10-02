@@ -3,7 +3,7 @@
 // Google Apps Script Backend (kode.gs)
 // ============================================================
 
-const SPREADSHEET_ID = 'MASUKKAN_SPREADSHEET_ID_ANDA_DI_SINI'; // Ganti dengan ID Spreadsheet
+const SPREADSHEET_ID = 'https://docs.google.com/spreadsheets/d/1ZTz7bT2mzHtCX4h9Btk7WEyDL56ahYAdlegSOyXpVCg/edit?pli=1&gid=0#gid=0'; // Ganti dengan ID Spreadsheet
 const SHEET_USERS = 'Users';
 const SHEET_TASKS = 'Tasks';
 const SHEET_INFO = 'Info';
